@@ -1,0 +1,29 @@
+{
+  "name": "letterpress-mcts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quasimik/letterpress-mcts.git"
+  },
+  "author": "Michael Liu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/quasimik/letterpress-mcts/issues"
+  },
+  "homepage": "https://github.com/quasimik/letterpress-mcts#readme",
+  "dependencies": {
+    "2d-board": "^2.0.1",
+    "backbone": "^1.3.3",
+    "collections": "^5.0.7",
+    "dictionatrie": "^1.0.4",
+    "dsjslib": "^0.6.14",
+    "express": "^4.15.5",
+    "tstl": "^1.5.9"
+  }
+}
