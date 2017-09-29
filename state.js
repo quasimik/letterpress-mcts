@@ -1,6 +1,6 @@
 'use strict'
 
-const WordMap = require('./word-map-small.js')
+const WordMap = require('./word-map.js')
 const Dictionary = require('dictionatrie')
 var dictionary = Dictionary()
 
