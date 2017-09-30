@@ -95,7 +95,7 @@ class State {
         }
         this.playedWords.sort()
         hash += this.playedWords.toString()
-        hash += '|' + this.nextToPlay
+        hash += '|' + this.currentPlayer
         return hash
     }
 }
