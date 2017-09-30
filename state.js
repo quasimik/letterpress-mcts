@@ -6,18 +6,15 @@ var dictionary = Dictionary()
 
 class State {
 
-    constructor(ownership, playedWords, nextToPlay, wordMap) {
+    constructor(ownership, playedWords, currentPlayer, wordMap) {
         this.ownership = ownership || []
         this.playedWords = playedWords || []
-        this.nextToPlay = nextToPlay || 1
+        this.currentPlayer = currentPlayer || 1
         this.wordMap = wordMap || new WordMap()
     }
 
-    static generateWordMap(letters) {
-
+    static generateWordMap(letters, numRows, numCols) {
         var wordMap = new WordMap()
-        var numRows = letters.length
-        var numCols = letters[0].length
 
         function genPlaysHelper(availableTiles, cellsFragment, wordFragment) {
             if (availableTiles.length === 0)
@@ -25,13 +22,11 @@ class State {
 
             for (var i = 0; i < availableTiles.length; i++) {
                 
-                var row = Math.floor(availableTiles[i] / numCols)
-                var col = availableTiles[i] % numCols
-                var newLetter = letters[row][col]
+                var newLetter = letters[availableTiles[i]]
 
                 // Check if this new word fragement is a prefix of any real word
                 var newWordFragment = wordFragment + newLetter
-                // console.log('at: ' + newWordFragment + ' (' + row + ',' + col + ')')
+                // console.log('at: ' + newWordFragment + ' (' + availableTiles[i] + ')')
                 if (!dictionary.has(newWordFragment.toLowerCase(), true)) // partial (prefix) match
                     continue
 
@@ -53,9 +48,7 @@ class State {
                 var maxIndex = i;
                 for (var j = 0; j < maxIndex; j++) {
                     // console.log(newAvailableTiles[j], newLetter)
-                    var row = Math.floor(newAvailableTiles[j] / numCols)
-                    var col = newAvailableTiles[j] % numCols
-                    if (letters[row][col] === newLetter) {
+                    if (letters[newAvailableTiles[j]] === newLetter) {
                         newAvailableTiles.splice(j, 1)
                         j--
                         maxIndex--
@@ -73,6 +66,8 @@ class State {
         for (var i = 0; i < numRows * numCols; i++) {
             availableTiles.push(i)
         }
+        // console.log(letters)
+        // console.log(availableTiles)
 
         // console.log(JSON.stringify(availableTiles))
         genPlaysHelper(availableTiles, [ ], '');
@@ -86,10 +81,8 @@ class State {
 
     get score() {
         var score = 0
-        for (var row of this.ownership) {
-            for (var own of row) {
-                score += own
-            }
+        for (var value of this.ownership) {
+            score+= value
         }
         return score
     }
@@ -97,10 +90,8 @@ class State {
     get hash() {
         // Letters are always the same
         var hash = ''
-        for (var row of this.ownership) {
-            for (var own of row) {
-                hash += own
-            }
+        for (var value of this.ownership) {
+            hash += value
         }
         this.playedWords.sort()
         hash += this.playedWords.toString()
