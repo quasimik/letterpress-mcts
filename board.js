@@ -19,6 +19,9 @@ class Board {
         // Generate starting ownership (all 0s)
         var ownership = new Array(this.letters.length)
         ownership.fill(0)
+        // ownership[0] = -1
+        // ownership[1] = -1
+        // ownership[4] = -1
         // console.log(ownership.toString())
 
         // Generate initial state
@@ -45,7 +48,39 @@ class Board {
         // Update ownership
         var ownership = state.ownership.slice()
         for (var cell of play[1]) {
-            ownership[cell] = state.currentPlayer
+            // Check surrounding 4 tiles.
+            // If any of the tiles are not owned by opposing player, update
+            // If all 4 owned by opposing player and tile is protected, skip
+            var row = Math.floor(cell / this.numCols)
+            var col = cell % this.numCols
+
+            // Up
+            var rowUp = row - 1
+            if (rowUp >= 0 && state.ownership[rowUp * this.numCols + col] !== -state.currentPlayer) {
+                ownership[cell] = state.currentPlayer
+                continue
+            }
+
+            // Down
+            var rowDown = row + 1
+            if (rowDown < this.numRows && state.ownership[rowDown * this.numCols + col] !== -state.currentPlayer) {
+                ownership[cell] = state.currentPlayer
+                continue
+            }
+
+            // Left
+            var colLeft = col - 1
+            if (colLeft >= 0 && state.ownership[row * this.numCols + colLeft] !== -state.currentPlayer) {
+                ownership[cell] = state.currentPlayer
+                continue
+            }
+
+            // Right
+            var colRight = col + 1
+            if (colRight < this.numCols && state.ownership[row * this.numCols + colRight] !== -state.currentPlayer) {
+                ownership[cell] = state.currentPlayer
+                continue
+            }
         }
 
         // Add played word to list of played words

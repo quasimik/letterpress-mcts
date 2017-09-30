@@ -38,7 +38,8 @@ console.log(board.legal_plays(state).length)
 // console.log(board.legal_plays(state))
 console.log(state.score)
 console.log(state.hash)
-var play = board.legal_plays(state)[0]
+var play = board.legal_plays(state)[1]
+console.log(play)
 var newState = board.next_state(state, play)
 console.log(state.hash)
 console.log(newState.hash)
