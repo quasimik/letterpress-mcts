@@ -5,8 +5,8 @@ const Play = require('./play.js')
 // Multi-map of unique words to non-unique arrays of cells
 class WordMap {
 
-    constructor() {
-        this.wordMap = new Map(); // map words to arrays of cells
+    constructor(map) {
+        this.wordMap = map || new Map(); // map words to arrays of cells
     }
     
     insert(word, cells) {
@@ -17,6 +17,12 @@ class WordMap {
 
     remove(word) { // Only remove words
         this.wordMap.delete(word)
+    }
+
+    copy() {
+        var newMap = new Map(this.wordMap)
+        var newWordMap = new WordMap(newMap)
+        return newWordMap
     }
 
     get plays() {

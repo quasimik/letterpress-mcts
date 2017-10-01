@@ -11,6 +11,9 @@ class Play {
     get cells() {
         return this.cells
     }
+    get hash() {
+        return this.word + this.cells.toString()
+    }
 }
 
 module.exports = Play

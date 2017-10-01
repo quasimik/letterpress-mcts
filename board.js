@@ -1,8 +1,6 @@
 'use strict'
 
 const State = require('./state.js')
-// const WordMap = require('./word-map.js')
-// const GeneratePlays = require('./generate-plays.js')
 
 class Board {
     constructor(letters, numRows, numCols, startingPlayer) {
@@ -33,8 +31,8 @@ class Board {
 
     current_player(state) {
         /* Takes the game state and returns the current player.
-        /*  1: Player
-        /* -1: Opponent
+        **  1: Player
+        ** -1: Opponent
         */
 
         return state.currentPlayer
@@ -42,7 +40,7 @@ class Board {
 
     next_state(state, play) {
         /* Takes the game state, and the move to be applied.
-        /* Returns the new game state.
+        ** Returns the new game state.
         */
 
         // Update ownership
@@ -91,7 +89,7 @@ class Board {
         var currentPlayer = -state.currentPlayer
 
         // Remove played word from word map
-        var wordMap = state.wordMap
+        var wordMap = state.wordMap.copy()
         wordMap.remove(play[0])
 
         var newState = new State(ownership, playedWords, currentPlayer, wordMap)
@@ -107,9 +105,9 @@ class Board {
 
     winner(/*state_history*/ state) {
         /* If game is not over, return 0.
-        /* If game is over, return score.
-        /* Score > 0 means player 1 won.
-        /* Score < 0 means player -1 won.
+        ** If game is over, return score.
+        ** Score > 0 means player 1 won.
+        ** Score < 0 means player -1 won.
         */
 
         if (state.ownership.some(function(e) { return e === 0 }))
