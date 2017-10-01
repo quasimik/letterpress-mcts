@@ -10,6 +10,7 @@ class MonteCarlo {
         this.state = null // Current state node
 
         this.nodes = new Map() // Map State hashes to StatNodes
+        // Add: Map state + play hashes to states? i.e. next_state cache?
     }
 
     update(state) {
@@ -45,8 +46,21 @@ class MonteCarlo {
 
             console.log(hash, ' : (', node.wins, '/', node.plays, ')')
         }
+        console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
 
-        return
+        // Get best play (highest wins)
+        var legal = this.board.legal_plays(this.state)
+        var maxWins = 0
+        var play
+        for (var pPlay of legal) {
+            var pState = this.board.next_state(this.state, pPlay) // TODO: move this to cache
+            var pWins = this.nodes.get(pState.hash).wins
+            if (pWins > maxWins) {
+                play = pPlay
+                maxWins = pWins
+            }
+        }
+        return play
     }
 
     run_simulation() {
@@ -55,7 +69,11 @@ class MonteCarlo {
         */
 
         var state = this.state // No need to copy because we do not modify it
+        var node = this.nodes.get(state.hash)
+
         var visitedStates = new Set()
+        visitedStates.add(state)
+        
         var winner = null
 
         // console.log('root : ' + state.hash)
@@ -72,35 +90,59 @@ class MonteCarlo {
                 break
 
             // Choose a play
-            var play = legal[Math.floor(Math.random() * legal.length)]
+            var play
+            if (legal.length === 1) {
+                // console.log('one')
+                play = legal[0]
+            }
+            else if (node !== undefined && node.fullyExpanded()) {
+                // console.log('stats')
+                var maxUCB1 = 0
+                for (var pPlay of legal) {
+                    var pState = this.board.next_state(state, pPlay) // TODO: move this to cache
+                    // console.log(pState.hash)
+                    var pUCB1 = this.nodes.get(pState.hash).getUCB1()
+                    // console.log(pState.hash + ' : ' + pUCB1)
+                    if (pUCB1 > maxUCB1) {
+                        play = pPlay
+                        maxUCB1 = pUCB1
+                    }
+                }
+            }
+            else {
+                // console.log('random')
+                play = legal[Math.floor(Math.random() * legal.length)]
+            }
 
-            // Advance the state
+            // Advance the state and node
             var newState = this.board.next_state(state, play)
-            var node = this.nodes.get(newState.hash)
+            var newNode = this.nodes.get(newState.hash)
 
             // console.log('at : ' + state.hash)
 
             // Expand the first unexpanded state this simulation run
-            if (expand && node === undefined) {
+            if (expand && newNode === undefined) {
 
                 // console.log('expanding : ' + newState.hash)
 
-                node = new StatNode()
-                node.totalChildren = this.board.legal_plays(newState).length
-                this.nodes.get(state.hash).children.add(node)
-                this.nodes.set(newState.hash, node)
+                newNode = new StatNode()
+                newNode.parent = node
+                newNode.totalChildren = this.board.legal_plays(newState).length
+                this.nodes.get(state.hash).children.add(newNode)
+                this.nodes.set(newState.hash, newNode)
             }
 
             // Track visited states for backpropagation
-            if (node !== undefined) { // Only add expanded states
+            if (newNode !== undefined) { // Only add expanded states
                 visitedStates.add(newState)
             }
 
-            state = newState
-
-            winner = this.board.winner(state)
+            winner = this.board.winner(newState)
             if (winner !== 0)
                 break
+
+            state = newState
+            node = newNode
         }
 
         // Backpropagate
@@ -115,14 +157,9 @@ class MonteCarlo {
             }
         }
         else {
-            console.log('no winner')
+            // console.log('no winner')
+            // TODO: figure out what to do when no winner
         }
-    }
-
-    static getUCB1(totalPlays, plays, wins, biasParam) {
-        var bias = biasParam || 2;
-        // process.stdout.write(wins + " " + plays + " " + bias + " " + this.parent.visits + " " + plays + "\n");
-        return (wins / plays) + Math.sqrt(bias * Math.log(totalPlays) / plays);
     }
 }
 

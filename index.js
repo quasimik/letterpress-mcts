@@ -44,7 +44,8 @@ console.log(board.legal_plays(state))
 
 var mc = new MonteCarlo(board, 10)
 mc.update(state)
-mc.get_play(1)
+var play = mc.get_play(1)
+console.log('best play : ' + play)
 
 // console.log(board.legal_plays(state))
 // console.log(state.score)
