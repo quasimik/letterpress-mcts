@@ -20,7 +20,8 @@ class MonteCarlo {
         this.state = state
         if (!this.nodes.has(state)) {
             var node = new StatNode()
-            node.totalChildren = this.board.legal_plays(state).length
+            node.unexpandedPlays = this.board.legal_plays(state)
+            // node.totalChildren = this.board.legal_plays(state).length
             this.nodes.set(state.hash, node)
         }
     }
@@ -76,19 +77,20 @@ class MonteCarlo {
         
         var winner = null
 
-        // console.log('root : ' + state.hash)
-
         // Run simulation
         var expand = true // Expand once per simulation
         for (var depth = 0; depth < this.maxDepth; depth++) {
 
             // Get legal plays
-            var legal = this.board.legal_plays(state)
+            var legal
+            if (node !== undefined && !node.fullyExpanded()) {
+                legal = node.unexpandedPlays
+            }
+            else
+                legal = this.board.legal_plays(state)
             // console.log('state : ' + state.hash)
             // console.log('legal : ' + legal)
-            if (legal.length === 0)
-                break
-
+            
             // Choose a play
             var play
             if (legal.length === 1) {
@@ -109,10 +111,14 @@ class MonteCarlo {
                     }
                 }
             }
-            else {
+            else if (legal.length !== 0) {
                 // console.log('random')
                 play = legal[Math.floor(Math.random() * legal.length)]
             }
+            else // No legal moves
+                break
+
+            // console.log('chosen play : ' + play)
 
             // Advance the state and node
             var newState = this.board.next_state(state, play)
@@ -122,13 +128,21 @@ class MonteCarlo {
 
             // Expand the first unexpanded state this simulation run
             if (expand && newNode === undefined) {
+                expand = false
 
                 // console.log('expanding : ' + newState.hash)
 
+                // Make new Node
                 newNode = new StatNode()
+                newNode.unexpandedPlays = this.board.legal_plays(newState)
                 newNode.parent = node
-                newNode.totalChildren = this.board.legal_plays(newState).length
-                this.nodes.get(state.hash).children.add(newNode)
+
+                // Update parent Node
+                node.children.add(newNode)
+                var index = node.unexpandedPlays.indexOf(play)
+                node.unexpandedPlays.splice(index, 1)
+
+                // Update Node map
                 this.nodes.set(newState.hash, newNode)
             }
 
@@ -151,13 +165,13 @@ class MonteCarlo {
             for (var state of visitedStates) {
                 var node = this.nodes.get(state.hash)
                 node.plays++
-                if (state.currentPlayer === -winner) {
+                if (state.currentPlayer === -winner) { // Gotta flip it
                     node.wins++
                 }
             }
         }
         else {
-            // console.log('no winner')
+            console.log('max depth reached OR no legal moves')
             // TODO: figure out what to do when no winner
         }
     }

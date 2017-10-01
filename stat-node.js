@@ -5,9 +5,8 @@ class StatNode {
         this.plays = 0
         this.wins = 0
 
-        // Children are StatNode objects
-        this.totalChildren = null
-        this.children = new Set()
+        this.unexpandedPlays = null // Expands into children
+        this.children = new Set() // Children are StatNode objects
 
         this.parent = null
     }
@@ -17,9 +16,10 @@ class StatNode {
     // }
 
     fullyExpanded() {
-        if (this.children.size === this.totalChildren)
+        if (this.unexpandedPlays !== null && this.unexpandedPlays.length === 0)
             return true
-        return false
+        else
+            return false
     }
 
     getUCB1(biasParam) {

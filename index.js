@@ -36,15 +36,15 @@ var letterBoard0 = [
 
 // var board = new Board(letterBoard5, 5, 5, 1)
 // var board = new Board(letterBoard4, 4, 4, 1)
-// var board = new Board(letterBoard3, 3, 3, 1)
-var board = new Board(letterBoard2, 2, 2, 1)
+var board = new Board(letterBoard3, 3, 3, 1)
+// var board = new Board(letterBoard2, 2, 2, 1)
 // var board = new Board(letterBoard0, 2, 3, 1)
 var state = board.start()
 console.log(board.legal_plays(state))
 
-var mc = new MonteCarlo(board, 10)
+var mc = new MonteCarlo(board, 100)
 mc.update(state)
-var play = mc.get_play(1)
+var play = mc.get_play(2)
 console.log('best play : ' + play)
 
 // console.log(board.legal_plays(state))
