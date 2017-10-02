@@ -25,14 +25,12 @@ class WordMap {
             return false
         var index = 0
         for (var i = 0; i < this.plays.length; i++) {
-            if (this.plays[i] !== variations[index]) {
-                newPlays.push(this.plays[i])
-            }
-            else {
+            if (this.plays[i] === variations[index]) {
+                this.plays.splice(i, 1)
+                i--
                 index++
             }
         }
-        this.plays = newPlays
         return this.map.delete(word)
     }
 
