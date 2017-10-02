@@ -1,6 +1,6 @@
 'use strict'
 
-const WordMap = require('./word-map-alt.js')
+const WordMap = require('./word-map.js')
 const Dictionary = require('dictionatrie')
 const path = require('path')
 const fs = require('fs')

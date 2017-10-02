@@ -3,43 +3,34 @@
 // Multi-map of unique words to non-unique arrays of cells
 class WordMap {
 
-    constructor(map, plays) {
-        this.map = map || new Map()
-        this.plays = plays || [ ] // Cells only
+    constructor(map) {
+        this.wordMap = map || new Map() // Map words to arrays of cells
     }
     
     insert(word, cells) {
-        var cellsArr = this.map.get(word) || [ ]
+        var cellsArr = this.wordMap.get(word) || [ ]
         cellsArr.push(cells)
-        this.map.set(word, cellsArr)
-
-        this.plays.push(cells)
+        this.wordMap.set(word, cellsArr)
     }
 
-    remove(word) {
-        // This should work because the order is guaranteed
-        // console.log('remove')
-        var newPlays = [ ]
-        var variations = this.map.get(word)
-        if (variations === undefined)
-            return false
-        var index = 0
-        for (var play of this.plays) {
-            if (play !== variations[index]) {
-                newPlays.push(play)
-            }
-            else {
-                index++
-            }
-        }
-        this.plays = newPlays
-        return this.map.delete(word)
+    remove(word) { // Only remove words
+        return this.wordMap.delete(word)
     }
 
     copy() {
-        var map = new Map(this.map)
-        var plays = this.plays.slice()
-        return new WordMap(map, plays)
+        var newMap = new Map(this.wordMap)
+        var newWordMap = new WordMap(newMap)
+        return newWordMap
+    }
+
+    get plays() { // Return cells without words
+        var plays = [ ]
+        for (var variations of this.wordMap.values()) {
+            for (var cells of variations) {
+                plays.push(cells)
+            }
+        }
+        return plays
     }
 }
 

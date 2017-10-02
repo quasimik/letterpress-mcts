@@ -43,7 +43,7 @@ describe('WordMap', function() {
         assert.deepEqual(wordMapCopy.plays[2], [0,3])
     })
     
-    it('remove nonexistent word: returns false', function() {
+    it('returns false when trying to remove nonexistent word', function() {
         assert(wordMap.remove('hi') === false)
     })
 })

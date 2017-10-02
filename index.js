@@ -44,7 +44,7 @@ console.log('legal plays : ' + board.legal_plays(state).length)
 
 var mc = new MonteCarlo(board, 100)
 mc.update(state)
-var play = mc.get_play(10)
+var play = mc.get_play(12)
 if (play)
     console.log('best play : ' + board.get_word(play) + ' at ' + play)
 else
