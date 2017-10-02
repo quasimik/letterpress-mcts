@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "profile": "rm isolate* ; NODE_ENV=production node --prof index.js && node --prof-process isolate* > prof.out",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

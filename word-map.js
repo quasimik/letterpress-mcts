@@ -6,7 +6,7 @@ const Play = require('./play.js')
 class WordMap {
 
     constructor(map) {
-        this.wordMap = map || new Map(); // map words to arrays of cells
+        this.wordMap = map || new Map() // Map words to arrays of cells
     }
     
     insert(word, cells) {
@@ -25,11 +25,11 @@ class WordMap {
         return newWordMap
     }
 
-    get plays() {
+    get plays() { // Return cells without words
         var plays = [ ]
-        for (var [word, variations] of this.wordMap) {
+        for (var variations of this.wordMap.values()) {
             for (var cells of variations) {
-                plays.push(new Play(word, cells))
+                plays.push(cells)
             }
         }
         return plays

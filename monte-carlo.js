@@ -61,16 +61,16 @@ class MonteCarlo {
         // Get best play (highest wins)
         var legal = this.board.legal_plays(this.state)
         var maxWins = 0
-        var play
-        for (var pPlay of legal) {
-            var pState = this.board.next_state(this.state, pPlay) // TODO: move this to cache
-            var pWins = this.nodes.get(pState.hash).wins
-            if (pWins > maxWins) {
-                play = pPlay
-                maxWins = pWins
-            }
-        }
-        return play
+        // var play
+        // for (var pPlay of legal) {
+        //     var pState = this.board.next_state(this.state, pPlay) // TODO: move this to cache
+        //     var pWins = this.nodes.get(pState.hash).wins
+        //     if (pWins > maxWins) {
+        //         play = pPlay
+        //         maxWins = pWins
+        //     }
+        // }
+        // return play
     }
 
     run_simulation() {

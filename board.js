@@ -38,6 +38,14 @@ class Board {
         return state.currentPlayer
     }
 
+    get_word(cells) {
+        var word = ''
+        for (var cell of cells) {
+            word += this.letters[cell]
+        }
+        return word
+    }
+
     next_state(state, play) {
         /* Takes the game state, and the move to be applied.
         ** Returns the new game state.
@@ -45,7 +53,7 @@ class Board {
 
         // Update ownership
         var ownership = state.ownership.slice()
-        for (var cell of play.cells) {
+        for (var cell of play) {
             // Check surrounding 4 tiles.
             // If any of the tiles are not owned by opposing player, update
             // If all 4 owned by opposing player and tile is protected, skip
@@ -83,14 +91,14 @@ class Board {
 
         // Add played word to list of played words
         var playedWords = state.playedWords.slice()
-        playedWords.push(play.word)
+        playedWords.push(this.get_word(play))
 
         // Flip current player
         var currentPlayer = -state.currentPlayer
 
         // Remove played word from word map
         var wordMap = state.wordMap.copy()
-        wordMap.remove(play.word)
+        wordMap.remove(this.get_word(play))
 
         var newState = new State(ownership, playedWords, currentPlayer, wordMap)
         return newState
