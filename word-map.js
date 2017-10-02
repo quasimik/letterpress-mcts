@@ -29,7 +29,7 @@ class WordMap {
         var plays = [ ]
         for (var [word, variations] of this.wordMap) {
             for (var cells of variations) {
-                plays.push([word, cells])
+                plays.push(new Play(word, cells))
             }
         }
         return plays

@@ -2,7 +2,8 @@
 
 const WordMap = require('./word-map.js')
 const Dictionary = require('dictionatrie')
-var dictionary = Dictionary()
+const path = require('path')
+const fs = require('fs')
 
 class State {
 
@@ -15,6 +16,8 @@ class State {
 
     static generateWordMap(letters, numRows, numCols) {
         var wordMap = new WordMap()
+        var words = fs.readFileSync(path.join(__dirname, 'enable1.txt'), 'utf8').split('\n')
+        var dictionary = Dictionary(words)
 
         function genPlaysHelper(availableTiles, cellsFragment, wordFragment) {
             if (availableTiles.length === 0)
@@ -30,7 +33,7 @@ class State {
                 if (!dictionary.has(newWordFragment.toLowerCase(), true)) // partial (prefix) match
                     continue
 
-                // console.log('is prefix: ' + newWordFragment)
+                // console.log('is prefix : ' + newWordFragment)
 
                 // Generate new available tiles and cell fragment
                 var newAvailableTiles = availableTiles.slice()
@@ -39,7 +42,7 @@ class State {
                 newCellsFragment.push(newTile) // push to new
 
                 if (dictionary.has(newWordFragment.toLowerCase())) { // complete match
-                    // console.log('found: ' + newWordFragment + ' at ' + JSON.stringify(newCellsFragment))
+                    // console.log('found : ' + newWordFragment + ' at ' + JSON.stringify(newCellsFragment))
                     wordMap.insert(newWordFragment, newCellsFragment)
                     // console.log(plays.inspect())
                 }

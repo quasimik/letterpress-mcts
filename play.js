@@ -5,12 +5,7 @@ class Play {
         this.word = word
         this.cells = cells
     }
-    get word() {
-        return this.word
-    }
-    get cells() {
-        return this.cells
-    }
+
     get hash() {
         return this.word + this.cells.toString()
     }

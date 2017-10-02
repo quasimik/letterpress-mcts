@@ -40,12 +40,13 @@ var board = new Board(letterBoard3, 3, 3, 1)
 // var board = new Board(letterBoard2, 2, 2, 1)
 // var board = new Board(letterBoard0, 2, 3, 1)
 var state = board.start()
-console.log(board.legal_plays(state))
+console.log('legal plays : ' + board.legal_plays(state).length)
+// console.log('legal plays : ' + board.legal_plays(state))
 
 var mc = new MonteCarlo(board, 100)
 mc.update(state)
-var play = mc.get_play(1200)
-console.log('best play : ' + play)
+var play = mc.get_play(10)
+console.log('best play : ' + play.hash)
 
 // console.log(board.legal_plays(state))
 // console.log(state.score)
@@ -57,7 +58,7 @@ console.log('best play : ' + play)
 // console.log(newState.hash)
 
 app.get('/', function(request, response) {
-    response.send(plays.getLongestWord())
+    response.send('hi')
 })
 
 // app.listen(3000, function() {

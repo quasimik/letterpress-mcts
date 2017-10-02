@@ -45,7 +45,7 @@ class Board {
 
         // Update ownership
         var ownership = state.ownership.slice()
-        for (var cell of play[1]) {
+        for (var cell of play.cells) {
             // Check surrounding 4 tiles.
             // If any of the tiles are not owned by opposing player, update
             // If all 4 owned by opposing player and tile is protected, skip
@@ -83,14 +83,14 @@ class Board {
 
         // Add played word to list of played words
         var playedWords = state.playedWords.slice()
-        playedWords.push(play[0])
+        playedWords.push(play.word)
 
         // Flip current player
         var currentPlayer = -state.currentPlayer
 
         // Remove played word from word map
         var wordMap = state.wordMap.copy()
-        wordMap.remove(play[0])
+        wordMap.remove(play.word)
 
         var newState = new State(ownership, playedWords, currentPlayer, wordMap)
         return newState

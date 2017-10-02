@@ -36,7 +36,7 @@ class MonteCarlo {
             this.run_simulation()
             games++
         }
-        console.log('games run: ' + games)
+        console.log('games run : ' + games)
 
         // Output statistics for depth=1 nodes
         console.log('-----')
