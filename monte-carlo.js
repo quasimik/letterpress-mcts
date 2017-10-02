@@ -20,7 +20,7 @@ class MonteCarlo {
         this.state = state
         if (!this.nodes.has(state)) {
             var node = new StatNode()
-            node.unexpandedPlays = this.board.legal_plays(state)
+            node.unexpandedPlays = this.board.legal_plays(state).slice()
             // node.totalChildren = this.board.legal_plays(state).length
             this.nodes.set(state.hash, node)
         }
@@ -143,7 +143,7 @@ class MonteCarlo {
 
                 // Make new Node
                 newNode = new StatNode()
-                newNode.unexpandedPlays = this.board.legal_plays(newState)
+                newNode.unexpandedPlays = this.board.legal_plays(newState).slice()
                 newNode.parent = node
 
                 // Update parent Node
