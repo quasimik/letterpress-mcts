@@ -3,12 +3,12 @@
 class StatNode {
     /* This stores stats
     */
-    
+
     constructor() {
         this.plays = 0
         this.wins = 0
 
-        this.unexpandedPlays = null // Expands into children
+        this.unexpandedPlays = null // Array of plays, expands into children
         this.children = new Set() // Children are StatNode objects
 
         this.parent = null

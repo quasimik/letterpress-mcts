@@ -44,8 +44,11 @@ console.log('legal plays : ' + board.legal_plays(state).length)
 
 var mc = new MonteCarlo(board, 100)
 mc.update(state)
-mc.get_play(10)
-// console.log('best play : ' + play.hash)
+var play = mc.get_play(10)
+if (play)
+    console.log('best play : ' + board.get_word(play) + ' at ' + play)
+else
+    console.log('INSUFFICIENT DATA FOR MEANINGFUL ANSWER.')
 
 app.get('/', function(request, response) {
     response.send('hi')
