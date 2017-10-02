@@ -21,7 +21,6 @@ class MonteCarlo {
         if (!this.nodes.has(state)) {
             var node = new StatNode()
             node.unexpandedPlays = this.board.legal_plays(state).slice()
-            // node.totalChildren = this.board.legal_plays(state).length
             this.nodes.set(state.hash, node)
         }
     }
@@ -31,6 +30,7 @@ class MonteCarlo {
         */
 
         var sims = 0
+        var earlyTerminations = 0
         var start = Date.now()
         var end = start + timeSeconds * 1000
         var notify = 3
@@ -41,36 +41,42 @@ class MonteCarlo {
                 console.log(notify + '/' + timeSeconds + ' seconds : ' + sims + ' simulations')
                 notify += 3
             }
-            this.run_simulation()
+
+            var winner = this.run_simulation()
+            
+            if (winner === 0)
+                earlyTerminations++
             sims++
         }
 
         console.log('simulations run : ' + sims)
+        // Max depth reached OR no legal moves
+        console.log('early terminations : ' + earlyTerminations)
 
-        // // Output statistics for depth=1 nodes
-        // console.log('-----')
-        // var depth1Nodes = this.nodes.get(this.state.hash).children
-        // for (var [hash, node] of this.nodes) {
-        //     if (!depth1Nodes.has(node))
-        //         continue
+        // Output statistics for depth=1 nodes
+        console.log('-----')
+        var depth1Nodes = this.nodes.get(this.state.hash).children
+        for (var [hash, node] of this.nodes) {
+            if (!depth1Nodes.has(node))
+                continue
 
-        //     console.log(hash, ' : (', node.wins, '/', node.plays, ')')
-        // }
-        // console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
+            console.log(hash, ' : (', node.wins, '/', node.plays, ')')
+        }
+        console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
 
         // Get best play (highest wins)
         var legal = this.board.legal_plays(this.state)
         var maxWins = 0
-        // var play
-        // for (var pPlay of legal) {
-        //     var pState = this.board.next_state(this.state, pPlay) // TODO: move this to cache
-        //     var pWins = this.nodes.get(pState.hash).wins
-        //     if (pWins > maxWins) {
-        //         play = pPlay
-        //         maxWins = pWins
-        //     }
-        // }
-        // return play
+        var play
+        for (var pPlay of legal) {
+            var pState = this.board.next_state(this.state, pPlay) // TODO: move this to cache
+            var pWins = this.nodes.get(pState.hash).wins
+            if (pWins > maxWins) {
+                play = pPlay
+                maxWins = pWins
+            }
+        }
+        return play
     }
 
     run_simulation() {
@@ -93,12 +99,19 @@ class MonteCarlo {
             // Get legal plays
             var legal
             if (node !== undefined && !node.fullyExpanded()) {
+                /* Node exists and not all stats are available.
+                ** Pick from list of unexpanded plays.
+                */
+
+                // console.log('pick from unexpanded')
                 legal = node.unexpandedPlays
             }
-            else
+            else {
+                // console.log('pick from full list')
                 legal = this.board.legal_plays(state)
+            }
             // console.log('state : ' + state.hash)
-            // console.log('legal : ' + legal)
+            // console.log('legal : ' + legal) // Warning: very verbose
             
             // Choose a play
             var play
@@ -111,9 +124,7 @@ class MonteCarlo {
                 var maxUCB1 = 0
                 for (var pPlay of legal) {
                     var pState = this.board.next_state(state, pPlay) // TODO: move this to cache
-                    // console.log(pState.hash)
                     var pUCB1 = this.nodes.get(pState.hash).getUCB1()
-                    // console.log(pState.hash + ' : ' + pUCB1)
                     if (pUCB1 > maxUCB1) {
                         play = pPlay
                         maxUCB1 = pUCB1
@@ -169,20 +180,22 @@ class MonteCarlo {
         }
 
         // Backpropagate
-        if (winner !== 0) {
-            // console.log('winner : ' + winner)
-            for (var state of visitedStates) {
-                var node = this.nodes.get(state.hash)
-                node.plays++
-                if (state.currentPlayer === -winner) { // Gotta flip it
-                    node.wins++
-                }
+        for (var state of visitedStates) {
+            /* Add statistics to all visited nodes
+            ** If no winner, 'plays' count is still updated
+            ** Not sure if this is the best approach.
+            */
+
+            var node = this.nodes.get(state.hash)
+            node.plays++
+            if (state.currentPlayer === -winner) { // Gotta flip it
+                node.wins++
             }
         }
-        else {
-            console.log('max depth reached OR no legal moves')
-            // TODO: figure out what to do when no winner
+        if (winner === 0) {
+            // console.log('max depth reached OR no legal moves')
         }
+        return winner
     }
 }
 
