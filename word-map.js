@@ -4,8 +4,8 @@
 class WordMap {
 
     constructor(map, plays) {
-        this.map = map || new Map()
-        this.plays = plays || [ ] // Cells only
+        this.map = map || new Map() // Map words to variations of plays
+        this.plays = plays || [ ] // Complete array of all plays
     }
     
     insert(word, cells) {
@@ -24,7 +24,7 @@ class WordMap {
         if (variations === undefined)
             return false
         var index = 0
-        for (var i = 0; i < this.plays.length; i++) {
+        for (var i = 0; i < this.plays.length && index < variations.length; i++) {
             if (this.plays[i] === variations[index]) {
                 this.plays.splice(i, 1)
                 i--
