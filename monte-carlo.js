@@ -50,6 +50,7 @@ class MonteCarlo {
         }
 
         console.log('simulations run : ' + sims)
+        console.log('avg. speed : ' + Math.floor(sims/timeSeconds) + '/s')
         // Max depth reached OR no legal moves
         console.log('early terminations : ' + earlyTerminations)
 

@@ -1,0 +1,4 @@
+WordMap.remove()
+    reversing the loop has negligible effect
+    .splice() is extremely slow on 5x5 boards (massive array)
+    
