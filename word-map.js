@@ -17,15 +17,16 @@ class WordMap {
     }
 
     remove(word) {
-        // This works because the order is guaranteed
+        // This works because insertion order is guaranteed
+        // Optimization idea: keep track of indexes for fast splice()
         var newPlays = [ ]
         var variations = this.map.get(word)
         if (variations === undefined)
             return false
         var index = 0
-        for (var play of this.plays) {
-            if (play !== variations[index]) {
-                newPlays.push(play)
+        for (var i = 0; i < this.plays.length; i++) {
+            if (this.plays[i] !== variations[index]) {
+                newPlays.push(this.plays[i])
             }
             else {
                 index++
