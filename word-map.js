@@ -1,7 +1,5 @@
 'use strict'
 
-const Play = require('./play.js')
-
 // Multi-map of unique words to non-unique arrays of cells
 class WordMap {
 
@@ -16,7 +14,7 @@ class WordMap {
     }
 
     remove(word) { // Only remove words
-        this.wordMap.delete(word)
+        return this.wordMap.delete(word)
     }
 
     copy() {
