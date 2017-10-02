@@ -16,7 +16,7 @@ class State {
 
     static generateWordMap(letters, numRows, numCols) {
         var wordMap = new WordMap()
-        var words = fs.readFileSync(path.join(__dirname, 'enable1.txt'), 'utf8').split('\n')
+        var words = fs.readFileSync('./enable1.txt', 'utf8').split('\n')
         var dictionary = Dictionary(words)
 
         function genPlaysHelper(availableTiles, cellsFragment, wordFragment) {
