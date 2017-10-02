@@ -30,24 +30,33 @@ class MonteCarlo {
         /* Calculate the best move from current state and return it
         */
 
-        var games = 0
+        var sims = 0
         var start = Date.now()
-        while (Date.now() < start + timeSeconds * 1000) {
+        var end = start + timeSeconds * 1000
+        var notify = 3
+
+        // Run simulations
+        while (Date.now() < end) {
+            if (Date.now() > start + notify * 1000) { // Notify every 3 seconds
+                console.log(notify + '/' + timeSeconds + ' seconds : ' + sims + ' simulations')
+                notify += 3
+            }
             this.run_simulation()
-            games++
+            sims++
         }
-        console.log('games run : ' + games)
 
-        // Output statistics for depth=1 nodes
-        console.log('-----')
-        var depth1Nodes = this.nodes.get(this.state.hash).children
-        for (var [hash, node] of this.nodes) {
-            if (!depth1Nodes.has(node))
-                continue
+        console.log('simulations run : ' + sims)
 
-            console.log(hash, ' : (', node.wins, '/', node.plays, ')')
-        }
-        console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
+        // // Output statistics for depth=1 nodes
+        // console.log('-----')
+        // var depth1Nodes = this.nodes.get(this.state.hash).children
+        // for (var [hash, node] of this.nodes) {
+        //     if (!depth1Nodes.has(node))
+        //         continue
+
+        //     console.log(hash, ' : (', node.wins, '/', node.plays, ')')
+        // }
+        // console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
 
         // Get best play (highest wins)
         var legal = this.board.legal_plays(this.state)

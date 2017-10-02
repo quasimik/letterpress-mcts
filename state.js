@@ -29,7 +29,7 @@ class State {
 
                 // Check if this new word fragement is a prefix of any real word
                 var newWordFragment = wordFragment + newLetter
-                // console.log('at: ' + newWordFragment + ' (' + availableTiles[i] + ')')
+                // console.log('at : ' + newWordFragment + ' (' + availableTiles[i] + ')')
                 if (!dictionary.has(newWordFragment.toLowerCase(), true)) // partial (prefix) match
                     continue
 

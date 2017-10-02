@@ -1,9 +1,10 @@
 'use strict'
 
 class StatNode {
+    /* This stores stats
+    */
+    
     constructor() {
-        /* This stores stats
-        */
         this.plays = 0
         this.wins = 0
 
@@ -12,10 +13,6 @@ class StatNode {
 
         this.parent = null
     }
-
-    // addChild(node) {
-    //     this.children.add(node)
-    // }
 
     fullyExpanded() {
         if (this.unexpandedPlays !== null && this.unexpandedPlays.length === 0)
