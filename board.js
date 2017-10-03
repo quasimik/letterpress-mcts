@@ -32,12 +32,25 @@ class Board {
         return state
     }
 
+    legal_plays(state) {
+        /* Take a state, and return a list of legal moves for current player
+        ** Returns legal moves as play indexes
+        */
+
+        return state.legalCache.plays
+    }
+
     next_state(state, play) {
         /* Takes the game state, and the move to be applied.
         ** Returns the new game state.
         */
 
         var play = this.wpm.actualize(play) // Actualize play from index
+
+        // Should not play a word played before
+        if (state.playedWords.indexOf(play.word) !== -1) {
+            throw new Error('Word (' + play.word + ') has been played before.')
+        }
 
         // Update ownership
         var ownership = state.ownership.slice()
@@ -93,14 +106,6 @@ class Board {
 
         var newState = new State(ownership, playedWords, currentPlayer, legalCache)
         return newState
-    }
-
-    legal_plays(state) {
-        /* Take a state, and return a list of legal moves for current player
-        ** Returns legal moves as play indexes
-        */
-
-        return state.legalCache.plays
     }
 
     winner(state) {

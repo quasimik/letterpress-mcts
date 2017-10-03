@@ -1,35 +1,32 @@
-var assert = require('assert')
-var WordMap = require('../word-map.js')
-var State = require('../state.js')
+const assert = require('assert')
+const LegalCache = require('../legal-cache.js')
+const State = require('../state.js')
 
 describe('State', function() {
 
-    var letters = [ 'C', 'O', 'O',
-                    'O', 'L', 'C' ]
-    var initialWordMap = State.generateWordMap(letters, 2, 3)
-    
-    // for (var play of initialWordMap.plays) {
-    //     var word = ''
-    //     for (var cell of play) {
-    //         word += letters[cell]
-    //     }
-    //     console.log(word + ' : ' + play)
-    // }
+    var ownership = [0, 1, 1, -1, -1, -1, 0, -1]
+    var plays = [0, 1, 2, 3, 4,    6, 7, 8]
+    var lc = new LegalCache(plays)
+    var state = new State(ownership, ['PLAYED', 'WORDS'], 1, lc)
 
-    it('generates initial WordMap properly', function() {
-        assert.equal(initialWordMap.plays.length, 33)
+    var ownership2 = [0, 1, 1, -1, -1, -1, 0, -1]
+    var plays2 = [0, 1, 2, 3]
+    var lc2 = new LegalCache(plays2)
+    var state2 = new State(ownership2, ['WORDS', 'PLAYED'], 1, lc2)
+
+    it('gives the right score', function() {
+        assert.equal(state.score, -2)
     })
-
-    var nextWordMap = initialWordMap.copy()
-    nextWordMap.remove('COOL') // Player 1 plays 1,2,4,5
-    nextWordMap.remove('COO') // Player -1 plays 0,1,2
-    var ownership = [ -1, -1, -1,
-                       0,  1,  1 ]
-    var state = new State(ownership, ['COOL', 'COO'], 1, nextWordMap)
-
-    it('has sane initial values', function() {
-        assert.equal(state.plays.length, 21)
-        assert.equal(state.score, -1)
-        assert.equal(state.hash, '-1-1-1011COO,COOL1')
+    it('returns all legal plays', function() {
+        assert.equal(state.legal.length, 8)
+        assert.equal(state.legal.indexOf(0), 0)
+        assert.equal(state.legal.indexOf(4), 4)
+        assert.equal(state.legal.indexOf(5), -1)
+        assert.equal(state.legal.indexOf(6), 5)
+        assert.equal(state.legal.indexOf(8), 7)
+    })
+    it('returns the right hash', function() {
+        assert.equal(state.hash, '011-1-1-10-1PLAYED,WORDS1')
+        assert.equal(state.hash, state2.hash)
     })
 })

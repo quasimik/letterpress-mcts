@@ -1,7 +1,5 @@
 'use strict'
 
-const LegalCache = require('./legal-cache.js')
-
 class State {
 
     constructor(ownership, playedWords, currentPlayer, legalCache) {
