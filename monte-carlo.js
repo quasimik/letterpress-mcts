@@ -13,6 +13,9 @@ class MonteCarlo {
 
         this.nodes = new Map() // Map State hashes to StatNodes
         // Add: Map state + play hashes to states? i.e. next_state cache?
+
+        // Informative/debug
+        this.deeps = 0
     }
 
     update(state) {
@@ -32,7 +35,9 @@ class MonteCarlo {
         */
 
         var sims = 0
+        var totalSims = 0
         var earlyTerminations = 0
+        var totalDeeps = 0
         var start = Date.now()
         var end = start + timeSeconds * 1000
         var notify = 3
@@ -40,7 +45,17 @@ class MonteCarlo {
         // Run simulations
         while (Date.now() < end) {
             if (Date.now() > start + notify * 1000) { // Notify every 3 seconds
-                console.log(notify + '/' + timeSeconds + ' seconds : ' + sims + ' simulations')
+                console.log('time(s) ' + notify + '/' + timeSeconds + 
+                            ' | sims ' + sims + 
+                            ' | rate(sims/s) ' + (sims/3).toFixed(1) + 
+                            ' | depth ' + (this.deeps/sims).toFixed(1))
+
+                totalSims += sims
+                sims = 0
+
+                totalDeeps += this.deeps
+                this.deeps = 0
+
                 notify += 3
             }
 
@@ -54,10 +69,11 @@ class MonteCarlo {
             sims++
         }
 
-        console.log('simulations run : ' + sims)
-        // Max depth reached OR no legal moves
-        console.log('early terminations : ' + earlyTerminations)
-        console.log('avg. speed : ' + Math.floor(sims/timeSeconds) + '/s')
+        console.log('time(s) ' + timeSeconds + '/' + timeSeconds + ' (FINISHED)')
+        console.log('total sims : ' + totalSims)
+        console.log('total rate(sims/s) : ' + (totalSims/timeSeconds).toFixed(1))
+        console.log('total avg. depth : ' + (totalDeeps/totalSims).toFixed(1))
+        console.log('early terminations : ' + earlyTerminations) // Max depth reached OR no legal moves
 
         // Output statistics for depth=1 nodes
         // console.log('-----')
@@ -105,6 +121,8 @@ class MonteCarlo {
         // Run simulation
         var expand = true // Expand once per simulation
         for (var depth = 0; depth < this.maxDepth; depth++) {
+
+            this.deeps++
 
             // Get legal plays
             var legal
