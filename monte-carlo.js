@@ -1,6 +1,6 @@
 'use strict'
 
-const StatNode = require('./stat-node.js')
+const MonteCarloNode = require('./monte-carlo-node.js')
 
 class MonteCarlo {
 
@@ -11,7 +11,7 @@ class MonteCarlo {
 
         this.state = null // Current state node
 
-        this.nodes = new Map() // Map State hashes to StatNodes
+        this.nodes = new Map() // Map: State.hash => MonteCarloNode
         // Add: Map state + play hashes to states? i.e. next_state cache?
 
         // Informative/debug
@@ -24,8 +24,7 @@ class MonteCarlo {
 
         this.state = state
         if (!this.nodes.has(state)) {
-            var node = new StatNode()
-            node.unexpandedPlays = this.board.legal_plays(state).slice()
+            var node = new MonteCarloNode(state)
             this.nodes.set(state.hash, node)
         }
     }
@@ -57,6 +56,12 @@ class MonteCarlo {
                 this.deeps = 0
 
                 notify += 3
+                if (notify === 30) {
+                    heapdump.writeSnapshot()
+                }
+                if (notify === 39) {
+                    heapdump.writeSnapshot()
+                }
             }
 
             var winner = this.run_simulation()
@@ -91,15 +96,15 @@ class MonteCarlo {
             return null
         
         // Get best play (highest wins)
-        var legal = this.board.legal_plays(this.state)
+        var legal = this.state.legal
         var maxWins = 0
         var bestPlay
-        for (var play of legal) {
-            var state = this.board.next_state(this.state, play) // TODO: move this to cache
-            var wins = this.nodes.get(state.hash).wins
-            if (wins > maxWins) {
-                bestPlay = play
-                maxWins = wins
+        var node = this.nodes.get(this.state.hash)
+        for (var i = 0; i < legal.length; i++) {
+            var childNode = node.next_node(legal[i])
+            if (childNode.wins > maxWins) {
+                bestPlay = legal[i]
+                maxWins = childNode.wins
             }
         }
         return this.board.wpm.actualize(bestPlay)
@@ -148,14 +153,13 @@ class MonteCarlo {
                 play = legal[0]
             }
             else if (node !== undefined && node.fullyExpanded()) {
-                // console.log('stats')
+                console.log('stats')
                 var maxUCB1 = 0
-                for (var pPlay of legal) {
-                    var pState = this.board.next_state(state, pPlay) // TODO: move this to cache
-                    var pUCB1 = this.nodes.get(pState.hash).getUCB1(this.UCB1ExploreParam)
-                    if (pUCB1 > maxUCB1) {
-                        play = pPlay
-                        maxUCB1 = pUCB1
+                for (var i = 0; i < legal.length; i++) {
+                    var childUCB1 = node.next_node(legal[i]).getUCB1(this.UCB1ExploreParam)
+                    if (childUCB1 > maxUCB1) {
+                        play = legal[i]
+                        maxUCB1 = childUCB1
                     }
                 }
             }
@@ -181,12 +185,12 @@ class MonteCarlo {
                 // console.log('expanding : ' + newState.hash)
 
                 // Make new Node
-                newNode = new StatNode()
-                newNode.unexpandedPlays = this.board.legal_plays(newState).slice()
+                newNode = new MonteCarloNode(newState)
                 newNode.parent = node
 
                 // Update parent Node
-                node.children.add(newNode)
+                // node.children.add(newNode)
+                node.children.set(play, newNode)
                 var index = node.unexpandedPlays.indexOf(play)
                 node.unexpandedPlays.splice(index, 1)
 

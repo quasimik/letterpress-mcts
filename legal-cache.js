@@ -12,6 +12,9 @@ class LegalCache {
         /* plays : [playI, playI, ...]
         ** plays must be in insertion order
         */
+        
+        // console.log('plays : ' + this.plays.length)
+        // console.log('remove : ' + plays.length)
 
         var playI = 0
         for (var i = 0; i < this.plays.length && playI < plays.length; i++) {

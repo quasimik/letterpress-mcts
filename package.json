@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --harmony index.js",
-    "profile": "rm isolate* ; NODE_ENV=production node --harmony --prof index.js && node --prof-process isolate* > prof.out",
+    "profile": "rm isolate* ; NODE_ENV=production node --harmony --prof index.js ; node --prof-process isolate* > prof.out",
     "test": "mocha test/tests.js"
   },
   "repository": {

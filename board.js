@@ -35,6 +35,7 @@ class Board {
     legal_plays(state) {
         /* Take a state, and return a list of legal moves for current player
         ** Returns legal moves as play indexes
+        ** This is absolutely useless
         */
 
         return state.legalCache.plays
