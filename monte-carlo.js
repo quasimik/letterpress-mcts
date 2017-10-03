@@ -24,7 +24,9 @@ class MonteCarlo {
 
         this.state = state
         if (!this.nodes.has(state)) {
-            var node = new MonteCarloNode(state)
+            var node = new MonteCarloNode()
+            node.unexpandedPlays = state.legal.slice()
+            // console.log(node.unexpandedPlays)
             this.nodes.set(state.hash, node)
         }
     }
@@ -56,12 +58,6 @@ class MonteCarlo {
                 this.deeps = 0
 
                 notify += 3
-                if (notify === 30) {
-                    heapdump.writeSnapshot()
-                }
-                if (notify === 39) {
-                    heapdump.writeSnapshot()
-                }
             }
 
             var winner = this.run_simulation()
@@ -81,15 +77,12 @@ class MonteCarlo {
         console.log('early terminations : ' + earlyTerminations) // Max depth reached OR no legal moves
 
         // Output statistics for depth=1 nodes
-        // console.log('-----')
-        // var depth1Nodes = this.nodes.get(this.state.hash).children
-        // for (var [hash, node] of this.nodes) {
-        //     if (!depth1Nodes.has(node))
-        //         continue
-
-        //     console.log(hash, ' : (', node.wins, '/', node.plays, ')')
-        // }
-        // console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
+        console.log('-----')
+        var depth1Nodes = this.nodes.get(this.state.hash).children
+        for (var [play, node] of depth1Nodes) {
+            console.log(this.board.next_state(this.state, play).hash, ' : (', node.wins, '/', node.plays, ')')
+        }
+        console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
 
         // If not all children are expanded, no best play
         if (!this.nodes.get(this.state.hash).fullyExpanded())
@@ -153,7 +146,8 @@ class MonteCarlo {
                 play = legal[0]
             }
             else if (node !== undefined && node.fullyExpanded()) {
-                console.log('stats')
+                // console.log('stats')
+                // console.log(node.unexpandedPlays)
                 var maxUCB1 = 0
                 for (var i = 0; i < legal.length; i++) {
                     var childUCB1 = node.next_node(legal[i]).getUCB1(this.UCB1ExploreParam)
@@ -185,7 +179,8 @@ class MonteCarlo {
                 // console.log('expanding : ' + newState.hash)
 
                 // Make new Node
-                newNode = new MonteCarloNode(newState)
+                newNode = new MonteCarloNode()
+                newNode.unexpandedPlays = newState.legal.slice()
                 newNode.parent = node
 
                 // Update parent Node

@@ -5,14 +5,12 @@ class MonteCarloNode {
     ** This also memoizes next_state
     */
 
-    constructor(state) {
-        this.state = state
+    constructor() {
 
         // Monte Carlo stuff
         this.plays = 0
         this.wins = 0
-        var legalCopy = state.legal.slice()
-        this.unexpandedPlays = legalCopy // Plays without Monte Carlo stats
+        this.unexpandedPlays = null // Plays without Monte Carlo stats
 
         // Tree stuff
         this.parent = null // MonteCarloNode object
