@@ -4,8 +4,8 @@
 class WordMap {
 
     constructor(map, plays) {
-        this.map = map || new Map() // Map words to variations of plays
-        this.plays = plays || [ ] // Complete array of all plays
+        this.map = map || new Map() // Map words to their variations of plays
+        this.plays = plays || [ ] // Complete array of all plays (which are indexes)
     }
     
     insert(word, cells) {
@@ -18,7 +18,6 @@ class WordMap {
 
     remove(word) {
         // This works because insertion order is guaranteed
-        // Optimization idea: keep track of indexes for fast splice()
         var newPlays = [ ]
         var variations = this.map.get(word)
         if (variations === undefined)

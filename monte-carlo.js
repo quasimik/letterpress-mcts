@@ -44,26 +44,29 @@ class MonteCarlo {
 
             var winner = this.run_simulation()
             
+            // if (sims === 33)
+            //     throw new Error('debug')
+            
             if (winner === 0)
                 earlyTerminations++
             sims++
         }
 
         console.log('simulations run : ' + sims)
-        console.log('avg. speed : ' + Math.floor(sims/timeSeconds) + '/s')
         // Max depth reached OR no legal moves
         console.log('early terminations : ' + earlyTerminations)
+        console.log('avg. speed : ' + Math.floor(sims/timeSeconds) + '/s')
 
         // Output statistics for depth=1 nodes
-        // console.log('-----')
-        // var depth1Nodes = this.nodes.get(this.state.hash).children
-        // for (var [hash, node] of this.nodes) {
-        //     if (!depth1Nodes.has(node))
-        //         continue
+        console.log('-----')
+        var depth1Nodes = this.nodes.get(this.state.hash).children
+        for (var [hash, node] of this.nodes) {
+            if (!depth1Nodes.has(node))
+                continue
 
-        //     console.log(hash, ' : (', node.wins, '/', node.plays, ')')
-        // }
-        // console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
+            console.log(hash, ' : (', node.wins, '/', node.plays, ')')
+        }
+        console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
 
         // If not all children are expanded, no best play
         if (!this.nodes.get(this.state.hash).fullyExpanded())
@@ -72,16 +75,16 @@ class MonteCarlo {
         // Get best play (highest wins)
         var legal = this.board.legal_plays(this.state)
         var maxWins = 0
-        var play
-        for (var pPlay of legal) {
-            var pState = this.board.next_state(this.state, pPlay) // TODO: move this to cache
-            var pWins = this.nodes.get(pState.hash).wins
-            if (pWins > maxWins) {
-                play = pPlay
-                maxWins = pWins
+        var bestPlay
+        for (var play of legal) {
+            var state = this.board.next_state(this.state, play) // TODO: move this to cache
+            var wins = this.nodes.get(state.hash).wins
+            if (wins > maxWins) {
+                bestPlay = play
+                maxWins = wins
             }
         }
-        return play
+        return this.board.plays.getPlay(bestPlay)
     }
 
     run_simulation() {
@@ -89,13 +92,13 @@ class MonteCarlo {
         ** then update statistics table.
         */
 
+        // Initial values
         var state = this.state // No need to copy because we do not modify it
         var node = this.nodes.get(state.hash)
+        var winner = null
 
         var visitedStates = new Set()
         visitedStates.add(state)
-        
-        var winner = null
 
         // Run simulation
         var expand = true // Expand once per simulation
@@ -149,7 +152,7 @@ class MonteCarlo {
             var newState = this.board.next_state(state, play)
             var newNode = this.nodes.get(newState.hash)
 
-            // console.log('at : ' + state.hash)
+            // console.log('at : ' + newState.hash)
 
             // Expand the first unexpanded state this simulation run
             if (expand && newNode === undefined) {

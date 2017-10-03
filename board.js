@@ -1,6 +1,7 @@
 'use strict'
 
 const State = require('./state.js')
+const Plays = require('./plays.js')
 
 class Board {
     constructor(letters, numRows, numCols, startingPlayer) {
@@ -8,6 +9,8 @@ class Board {
         this.numRows = numRows || 0
         this.numCols = numCols || 0
         this.startingPlayer = startingPlayer || 1 // 1 or -1
+
+        this.plays = new Plays(letters)
     }
 
     start() {
@@ -17,14 +20,10 @@ class Board {
         // Generate starting ownership (all 0s)
         var ownership = new Array(this.letters.length)
         ownership.fill(0)
-        // ownership[0] = -1
-        // ownership[1] = -1
-        // ownership[4] = -1
-        // console.log(ownership.toString())
 
         // Generate initial state
-        var initialWordMap = State.generateWordMap(this.letters, this.numRows, this.numCols)
-        var state = new State(ownership, [ ], this.startingPlayer, initialWordMap)
+        // var getLegalPlayIndexes = this.plays.getLegalPlayIndexes([ ])
+        var state = new State(ownership, this.startingPlayer)
 
         return state
     }
@@ -46,14 +45,16 @@ class Board {
         return word
     }
 
-    next_state(state, play) {
+    next_state(state, playIndex) {
         /* Takes the game state, and the move to be applied.
         ** Returns the new game state.
         */
 
+        var play = this.plays.getPlay(playIndex)
+
         // Update ownership
         var ownership = state.ownership.slice()
-        for (var cell of play) {
+        for (var cell of play.cells) { // Slow but not used often
             // Check surrounding 4 tiles.
             // If any of the tiles are not owned by opposing player, update
             // If all 4 owned by opposing player and tile is protected, skip
@@ -93,40 +94,40 @@ class Board {
         var playedWords = state.playedWords.slice()
         // console.log('play : ' + play)
         // console.log('word : ' + this.get_word(play))
-        playedWords.push(this.get_word(play))
+        playedWords.push(play.word)
 
         // Flip current player
         var currentPlayer = -state.currentPlayer
 
-        // Remove played word from word map
-        var wordMap = state.wordMap.copy()
-        wordMap.remove(this.get_word(play))
+        // // Remove played word from word map
+        // var wordMap = state.wordMap.copy()
+        // wordMap.remove(this.get_word(play))
 
-        var newState = new State(ownership, playedWords, currentPlayer, wordMap)
+        var newState = new State(ownership, currentPlayer, playedWords)
         return newState
     }
 
-    legal_plays(/*state_history*/ state) {
+    legal_plays(state) {
         /* Take a state, and return a list of legal moves for current player
         */
 
-        return state.plays
+        return this.plays.getLegalPlayIndexes(state.playedWords)
     }
 
-    winner(/*state_history*/ state) {
+    winner(state) {
         /* If game is not over, return 0.
         ** If game is over, return score.
         ** Score > 0 means player 1 won.
         ** Score < 0 means player -1 won.
         */
 
-        if (state.ownership.some(function(e) { return e === 0 }))
+        if (state.ownership.some(function(owner) { return owner === 0 }))
             return 0
         var score = 0
         for (var owner of state.ownership) {
             score += owner
         }
-        return owner
+        return score > 0 ? 1 : -1
     }
 }
 
