@@ -34,17 +34,17 @@ var letterBoard0 = [
     'C', 'O', 'O',
     'O', 'L', 'C' ]
 
-var board = new Board(letterBoard5, 5, 5, 1)
-// var board = new Board(letterBoard4, 4, 4, 1)
+// var board = new Board(letterBoard5, 5, 5, 1)
+var board = new Board(letterBoard4, 4, 4, 1)
 // var board = new Board(letterBoard3, 3, 3, 1)
 // var board = new Board(letterBoard2, 2, 2, 1)
 // var board = new Board(letterBoard0, 2, 3, 1)
 var state = board.start()
 console.log('legal plays : ' + board.legal_plays(state).length)
 
-var mc = new MonteCarlo(board, 100)
+var mc = new MonteCarlo(board, 100, 10)
 mc.update(state)
-var play = mc.get_play(6)
+var play = mc.get_play(12)
 if (play)
     console.log('best play : ' + play.word + ' at ' + play.cells)
 else

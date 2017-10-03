@@ -6,32 +6,38 @@ const fs = require('fs')
 const words = fs.readFileSync('./enable1.txt', 'utf8').split('\n')
 const dictionary = Dictionary(words)
 
-// Backing store of all plays in the given letters
-class Plays {
+class WordPlayMap {
+    /* Backing store of all plays
+    */
 
     constructor(letters) {
 
         console.log('generating plays...')
         var start = Date.now()
-        var gen = Plays.genPlays(letters)
+        var gen = WordPlayMap.genPlays(letters)
         var duration = Math.floor((Date.now() - start) / 1000)
         console.log('generated ' + gen.plays.length + ' plays in ' + duration + ' seconds')
 
-        this.map = gen.map // Maps words to indexes of plays
-        this.plays = gen.plays // Array of all plays
+        this.words = gen.words // Map: word => wordI // Optimization: Maybe use plain array?
+        this.combs = gen.combs // [[playI, playI, ...], [playI, playI, ...], ...]
+        this.plays = gen.plays // [Play, Play, ...]
     }
 
     static genPlays(letters) {
-        /* Generate plays
+        /* Generate everything
         */
 
-        var map = new Map()
+        var words = new Map()
+        var combs = [ ]
         var plays = [ ]
+
+        var wordI = 0
+        var playI = 0
 
         var availableTiles = [ ]
         for (var i = 0; i < letters.length; i++)
             availableTiles.push(i)
-        var playIndex = 0
+
         genPlaysHelper(availableTiles, [ ], '');
 
         function genPlaysHelper(availableTiles, cellsFragment, wordFragment) {
@@ -60,15 +66,20 @@ class Plays {
 
                     // console.log('found : ' + newWordFragment + ' at ' + JSON.stringify(newCellsFragment))
 
-                    // Update map
-                    var variations = map.get(newWordFragment) || [ ]
-                    variations.push(playIndex)
-                    map.set(newWordFragment, variations)
-                    playIndex++
+                    // Update words and combs
+                    if (words.has(newWordFragment)) {
+                        combs[words.get(newWordFragment)].push(playI)
+                    }
+                    else {
+                        words.set(newWordFragment, wordI)
+                        combs.push([playI])
+                        wordI++
+                    }
 
                     // Update plays
                     var play = new Play(newWordFragment, newCellsFragment)
                     plays.push(play)
+                    playI++
                 }
 
                 // Remove earlier cells of the same letter to avoid duplicate search
@@ -88,31 +99,31 @@ class Plays {
                 genPlaysHelper(newAvailableTiles, newCellsFragment, newWordFragment);
             }
         }
-
-        var gen = { 'map' : map, 'plays' : plays }
-        return gen
+        return { 'words' : words, 'combs' : combs, 'plays' : plays }
     }
 
-    getPlay(playIndex) {
-        return this.plays[playIndex]
-    }
+    allPlays() {
+        /* Get all plays possible on the board
+        */
 
-    getLegalPlayIndexes(playedWords) { // Probably super slow
-        var legalPlays = [ ]
-        for (var [word, variations] of this.map) {
-            var push = true
-            for (var i = 0; i < playedWords.length; i++) {
-                if (word === playedWords[i])
-                    push = false
-            }
-            if (push) {
-                for (var i = 0; i < variations.length; i++) {
-                    legalPlays.push(variations[i])
-                }
-            }
+        var plays = [ ]
+        for (var i = 0; i < this.plays.length; i++) {
+            plays.push(i)
         }
-        return legalPlays
+        return plays
+    }
+
+    actualize(playI) {
+        return this.plays[playI]
+    }
+
+    getPlays(word) {
+        /* Get all plays using given word as an array of play indexes
+        */
+
+        var wordI = this.words.get(word)
+        return this.combs[wordI]
     }
 }
 
-module.exports = Plays
+module.exports = WordPlayMap

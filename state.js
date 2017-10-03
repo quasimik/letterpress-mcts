@@ -1,13 +1,14 @@
 'use strict'
 
-// const WordMap = require('./word-map.js')
+const LegalCache = require('./legal-cache.js')
 
 class State {
 
-    constructor(ownership, currentPlayer, playedWords/*, map, playIndexes*/) {
-        this.ownership = ownership || [ ]
-        this.currentPlayer = currentPlayer || 1
-        this.playedWords = playedWords || [ ]
+    constructor(ownership, playedWords, currentPlayer, legalCache) {
+        this.ownership = ownership
+        this.playedWords = playedWords
+        this.currentPlayer = currentPlayer
+        this.legalCache = legalCache
     }
 
     get score() {
@@ -16,6 +17,10 @@ class State {
             score+= value
         }
         return score
+    }
+
+    get legal() {
+        return this.legalCache.plays
     }
 
     get hash() {

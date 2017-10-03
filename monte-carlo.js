@@ -4,9 +4,11 @@ const StatNode = require('./stat-node.js')
 
 class MonteCarlo {
 
-    constructor(board, maxDepth) {
+    constructor(board, maxDepth, UCB1ExploreParam) {
         this.board = board
         this.maxDepth = maxDepth || Infinity
+        this.UCB1ExploreParam = UCB1ExploreParam || 2
+
         this.state = null // Current state node
 
         this.nodes = new Map() // Map State hashes to StatNodes
@@ -43,7 +45,7 @@ class MonteCarlo {
             }
 
             var winner = this.run_simulation()
-            
+
             // if (sims === 33)
             //     throw new Error('debug')
             
@@ -58,15 +60,15 @@ class MonteCarlo {
         console.log('avg. speed : ' + Math.floor(sims/timeSeconds) + '/s')
 
         // Output statistics for depth=1 nodes
-        console.log('-----')
-        var depth1Nodes = this.nodes.get(this.state.hash).children
-        for (var [hash, node] of this.nodes) {
-            if (!depth1Nodes.has(node))
-                continue
+        // console.log('-----')
+        // var depth1Nodes = this.nodes.get(this.state.hash).children
+        // for (var [hash, node] of this.nodes) {
+        //     if (!depth1Nodes.has(node))
+        //         continue
 
-            console.log(hash, ' : (', node.wins, '/', node.plays, ')')
-        }
-        console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
+        //     console.log(hash, ' : (', node.wins, '/', node.plays, ')')
+        // }
+        // console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
 
         // If not all children are expanded, no best play
         if (!this.nodes.get(this.state.hash).fullyExpanded())
@@ -84,7 +86,7 @@ class MonteCarlo {
                 maxWins = wins
             }
         }
-        return this.board.plays.getPlay(bestPlay)
+        return this.board.wpm.actualize(bestPlay)
     }
 
     run_simulation() {
@@ -132,7 +134,7 @@ class MonteCarlo {
                 var maxUCB1 = 0
                 for (var pPlay of legal) {
                     var pState = this.board.next_state(state, pPlay) // TODO: move this to cache
-                    var pUCB1 = this.nodes.get(pState.hash).getUCB1()
+                    var pUCB1 = this.nodes.get(pState.hash).getUCB1(this.UCB1ExploreParam)
                     if (pUCB1 > maxUCB1) {
                         play = pPlay
                         maxUCB1 = pUCB1

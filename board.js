@@ -1,7 +1,8 @@
 'use strict'
 
 const State = require('./state.js')
-const Plays = require('./plays.js')
+const WordPlayMap = require('./word-play-map.js')
+const LegalCache = require('./legal-cache.js')
 
 class Board {
     constructor(letters, numRows, numCols, startingPlayer) {
@@ -10,47 +11,33 @@ class Board {
         this.numCols = numCols || 0
         this.startingPlayer = startingPlayer || 1 // 1 or -1
 
-        this.plays = new Plays(letters)
+        this.wpm = new WordPlayMap(letters)
     }
 
     start() {
-        /* Returns a representation of the starting state of the game.
+        /* Returns the starting state.
         */
 
         // Generate starting ownership (all 0s)
         var ownership = new Array(this.letters.length)
         ownership.fill(0)
 
+        // Generate initial cache of legal plays
+        var legalCache = new LegalCache(this.wpm.allPlays())
+        // console.log(this.wpm.allPlays())
+
         // Generate initial state
-        // var getLegalPlayIndexes = this.plays.getLegalPlayIndexes([ ])
-        var state = new State(ownership, this.startingPlayer)
+        var state = new State(ownership, [ ], this.startingPlayer, legalCache)
 
         return state
     }
 
-    current_player(state) {
-        /* Takes the game state and returns the current player.
-        **  1: Player
-        ** -1: Opponent
-        */
-
-        return state.currentPlayer
-    }
-
-    get_word(cells) {
-        var word = ''
-        for (var cell of cells) {
-            word += this.letters[cell]
-        }
-        return word
-    }
-
-    next_state(state, playIndex) {
+    next_state(state, play) {
         /* Takes the game state, and the move to be applied.
         ** Returns the new game state.
         */
 
-        var play = this.plays.getPlay(playIndex)
+        var play = this.wpm.actualize(play) // Actualize play from index
 
         // Update ownership
         var ownership = state.ownership.slice()
@@ -90,28 +77,30 @@ class Board {
             }
         }
 
-        // Add played word to list of played words
+        // Update played words
         var playedWords = state.playedWords.slice()
         // console.log('play : ' + play)
         // console.log('word : ' + this.get_word(play))
         playedWords.push(play.word)
 
-        // Flip current player
+        // Update current player
         var currentPlayer = -state.currentPlayer
 
-        // // Remove played word from word map
-        // var wordMap = state.wordMap.copy()
-        // wordMap.remove(this.get_word(play))
+        // Update legal plays
+        var legalCache = state.legalCache.copy()
+        var playsToRemove = this.wpm.getPlays(play.word)
+        legalCache.remove(playsToRemove)
 
-        var newState = new State(ownership, currentPlayer, playedWords)
+        var newState = new State(ownership, playedWords, currentPlayer, legalCache)
         return newState
     }
 
     legal_plays(state) {
         /* Take a state, and return a list of legal moves for current player
+        ** Returns legal moves as play indexes
         */
 
-        return this.plays.getLegalPlayIndexes(state.playedWords)
+        return state.legalCache.plays
     }
 
     winner(state) {
@@ -121,10 +110,10 @@ class Board {
         ** Score < 0 means player -1 won.
         */
 
-        if (state.ownership.some(function(owner) { return owner === 0 }))
-            return 0
         var score = 0
         for (var owner of state.ownership) {
+            if (owner === 0)
+                return 0
             score += owner
         }
         return score > 0 ? 1 : -1
