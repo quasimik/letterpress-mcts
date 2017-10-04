@@ -3,9 +3,19 @@ Notes:
 The agent seems to be approaching the limits of vanilla MCTS.
 Implementing a custom first-play policy seems like a good way to delay exploration of all child nodes.
 Move groups might be an interesting avenue to reduce the effective branching factor.
+Perhaps also consider 
+Played word prefix removal is not implemented.
 
+Links & Papers:
 
-Papers:
+MCTS Improvements
+http://www.cameronius.com/research/mcts/enhancements/index.html
 
-Move groups in UCT
+Transpositions and Move Groups in Monte Carlo Tree Search (2008)
+http://alum.wpi.edu/~jbrodeur/cig08.pdf
+
+Revisiting Move Groups in Monte Carlo Tree Search (2011)
 https://webdocs.cs.ualberta.ca/~mmueller/ps/GVanEyck-MoveGroups-Final.pdf
+
+A Survey of Monte Carlo Tree Search Methods (2012)
+http://mcts.ai/pubs/mcts-survey-master.pdf

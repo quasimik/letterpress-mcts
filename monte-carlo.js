@@ -19,7 +19,7 @@ class MonteCarlo {
     }
 
     update(state) {
-        /* Update state which we want to find the best play for
+        /* Update the state to find the best move for.
         */
 
         this.state = state
@@ -31,8 +31,9 @@ class MonteCarlo {
         }
     }
 
-    get_play(timeSeconds) {
-        /* Calculate the best move from current state and return it
+    get_play(timeLimit) {
+        /* Run as many simulations as possible until the time limit.
+        ** From the available statistics, calculate the best move and return it.
         */
 
         var sims = 0
@@ -40,13 +41,13 @@ class MonteCarlo {
         var earlyTerminations = 0
         var totalDeeps = 0
         var start = Date.now()
-        var end = start + timeSeconds * 1000
+        var end = start + timeLimit * 1000
         var notify = 3
 
         // Run simulations
         while (Date.now() < end) {
             if (Date.now() > start + notify * 1000) { // Notify every 3 seconds
-                console.log('time(s) ' + notify + '/' + timeSeconds + 
+                console.log('time(s) ' + notify + '/' + timeLimit + 
                             ' | sims ' + sims + 
                             ' | rate(sims/s) ' + (sims/3).toFixed(1) + 
                             ' | depth ' + (this.deeps/sims).toFixed(1))
@@ -70,9 +71,9 @@ class MonteCarlo {
             sims++
         }
 
-        console.log('time(s) ' + timeSeconds + '/' + timeSeconds + ' (FINISHED)')
+        console.log('time(s) ' + timeLimit + '/' + timeLimit + ' (FINISHED)')
         console.log('total sims : ' + totalSims)
-        console.log('total rate(sims/s) : ' + (totalSims/timeSeconds).toFixed(1))
+        console.log('total rate(sims/s) : ' + (totalSims/timeLimit).toFixed(1))
         console.log('total avg. depth : ' + (totalDeeps/totalSims).toFixed(1))
         console.log('early terminations : ' + earlyTerminations) // Max depth reached OR no legal moves
 
@@ -104,8 +105,8 @@ class MonteCarlo {
     }
 
     run_simulation() {
-        /* Play one random game to completion from current state,
-        ** then update statistics table.
+        /* Play one game to completion from the current state.
+        ** Update the search tree with new information from the game result.
         */
 
         // Initial values

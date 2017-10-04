@@ -33,17 +33,15 @@ class Board {
     }
 
     legal_plays(state) {
-        /* Take a state, and return a list of legal moves for current player
-        ** Returns legal moves as play indexes
-        ** This is absolutely useless
+        /* Return the current player's legal moves from the given state.
         */
 
         return state.legalCache.plays
     }
 
     next_state(state, play) {
-        /* Takes the game state, and the move to be applied.
-        ** Returns the new game state.
+        /* Take the game state, and the move to be applied.
+        ** Return the new game state.
         */
 
         var play = this.wpm.actualize(play) // Actualize play from index
@@ -110,10 +108,8 @@ class Board {
     }
 
     winner(state) {
-        /* If game is not over, return 0.
-        ** If game is over, return score.
-        ** Score > 0 means player 1 won.
-        ** Score < 0 means player -1 won.
+        /* If the game is over, return the winner.
+        ** If the game is not over, return 0.
         */
 
         var score = 0
