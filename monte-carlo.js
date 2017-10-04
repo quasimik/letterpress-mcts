@@ -185,7 +185,7 @@ class MonteCarlo {
 
                 // Update parent Node
                 // node.children.add(newNode)
-                node.children.set(play, newNode)
+                node.children[play] = newNode
                 var index = node.unexpandedPlays.indexOf(play)
                 node.unexpandedPlays.splice(index, 1)
 

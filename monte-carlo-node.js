@@ -14,11 +14,11 @@ class MonteCarloNode {
 
         // Tree stuff
         this.parent = null // MonteCarloNode object
-        this.children = new Map() // Map: Play => MonteCarloNode
+        this.children = [ ] // Play => MonteCarloNode
     }
 
     next_node(play) { // Memoized next_state
-        var node = this.children.get(play)
+        var node = this.children[play]
         if (node !== undefined) {
             return node
         }
