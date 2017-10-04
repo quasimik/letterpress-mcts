@@ -1,0 +1,11 @@
+Notes:
+
+The agent seems to be approaching the limits of vanilla MCTS.
+Implementing a custom first-play policy seems like a good way to delay exploration of all child nodes.
+Move groups might be an interesting avenue to reduce the effective branching factor.
+
+
+Papers:
+
+Move groups in UCT
+https://webdocs.cs.ualberta.ca/~mmueller/ps/GVanEyck-MoveGroups-Final.pdf

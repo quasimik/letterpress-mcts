@@ -88,16 +88,16 @@ class MonteCarlo {
         if (!this.nodes.get(this.state.hash).fullyExpanded())
             return null
         
-        // Get best play (highest wins)
+        // Get best play (most plays)
         var legal = this.state.legal
-        var maxWins = 0
+        var maxPlays = 0
         var bestPlay
         var node = this.nodes.get(this.state.hash)
         for (var i = 0; i < legal.length; i++) {
             var childNode = node.next_node(legal[i])
-            if (childNode.wins > maxWins) {
+            if (childNode.plays > maxPlays) {
                 bestPlay = legal[i]
-                maxWins = childNode.wins
+                maxPlays = childNode.plays
             }
         }
         return this.board.wpm.actualize(bestPlay)
