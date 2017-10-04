@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --harmony index.js",
-    "profile": "rm isolate* ; NODE_ENV=production node --harmony --prof index.js ; node --prof-process isolate* > prof.out",
+    "start": "node --harmony --max_old_space_size=4096 index.js",
+    "profile": "rm isolate* ; NODE_ENV=production node --harmony --max_old_space_size=4096 --prof index.js ; node --prof-process isolate* > prof.out",
     "test": "mocha test/tests.js"
   },
   "repository": {

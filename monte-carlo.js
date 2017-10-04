@@ -77,12 +77,12 @@ class MonteCarlo {
         console.log('early terminations : ' + earlyTerminations) // Max depth reached OR no legal moves
 
         // Output statistics for depth=1 nodes
-        console.log('-----')
-        var depth1Nodes = this.nodes.get(this.state.hash).children
-        for (var [play, node] of depth1Nodes) {
-            console.log(this.board.next_state(this.state, play).hash, ' : (', node.wins, '/', node.plays, ')')
-        }
-        console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
+        // console.log('-----')
+        // var depth1Nodes = this.nodes.get(this.state.hash).children
+        // for (var [play, node] of depth1Nodes) {
+        //     console.log(this.board.next_state(this.state, play).hash, ' : (', node.wins, '/', node.plays, ')')
+        // }
+        // console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
 
         // If not all children are expanded, no best play
         if (!this.nodes.get(this.state.hash).fullyExpanded())
