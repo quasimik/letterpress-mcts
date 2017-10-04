@@ -11,18 +11,18 @@ describe('Board', () => {
     describe('start()', () => {
         it('generates the correct starting state', () => {
             assert.equal(state.score, 0)
-            assert.equal(state.legal.length, 33)
-            assert.equal(state.legal.indexOf(32), 32)
-            assert.equal(state.legal.indexOf(33), -1)
+            assert.equal(state.legal.length, 36)
+            assert.equal(state.legal.indexOf(35), 35)
+            assert.equal(state.legal.indexOf(36), -1)
             assert.equal(state.hash, '0000001')
         })
     })
 
     describe('legal_plays()', () => {
         it('returns the right number of legal plays', () => {
-            assert.equal(board.legal_plays(state).length, 33)
-            assert.equal(board.legal_plays(state).indexOf(32), 32)
-            assert.equal(board.legal_plays(state).indexOf(33), -1)
+            assert.equal(board.legal_plays(state).length, 36)
+            assert.equal(board.legal_plays(state).indexOf(35), 35)
+            assert.equal(board.legal_plays(state).indexOf(36), -1)
         })
     })
 
@@ -34,14 +34,14 @@ describe('Board', () => {
             var stateLo1 = board.next_state(state, loPlays[1])
             var stateLo2 = board.next_state(state, loPlays[2])
 
-            assert.equal(board.legal_plays(state).length, 33)
-            assert.equal(board.legal_plays(state).indexOf(32), 32)
-            assert.equal(board.legal_plays(state).indexOf(33), -1)
+            assert.equal(board.legal_plays(state).length, 36)
+            assert.equal(board.legal_plays(state).indexOf(35), 35)
+            assert.equal(board.legal_plays(state).indexOf(36), -1)
             assert.notEqual(board.legal_plays(state).indexOf(loPlays[0]), -1)
             assert.notEqual(board.legal_plays(state).indexOf(loPlays[1]), -1)
             assert.notEqual(board.legal_plays(state).indexOf(loPlays[2]), -1)
 
-            assert.equal(board.legal_plays(stateLo0).length, 30)
+            assert.equal(board.legal_plays(stateLo0).length, 33)
             assert.equal(board.legal_plays(stateLo0).indexOf(loPlays[0]), -1)
             assert.equal(board.legal_plays(stateLo0).indexOf(loPlays[1]), -1)
             assert.equal(board.legal_plays(stateLo0).indexOf(loPlays[2]), -1)

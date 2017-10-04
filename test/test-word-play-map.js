@@ -6,20 +6,21 @@ describe('WordPlayMap', () => {
     var letters = [ 'C', 'O', 'O', 'O', 'L', 'C' ]
     var wpm = new WordPlayMap(letters)
     
-    // for (var play of wpm.allPlays()) {
-    //     console.log(wpm.actualize(play))
-    // }
+    for (var play of wpm.allPlays()) {
+        console.log(wpm.actualize(play))
+    }
 
-    var wordCheck = ['LO', 'LOO', 'LOCO', 'COO', 'COL', 'COOL', 'COCO']
+    var wordCheck = ['OO', 'LO', 'LOO', 'LOCO', 'COO', 'COL', 'COOL', 'COCO']
     it('generates words properly', () => {
-        assert.equal(wpm.words.size, 7)
+        assert.equal(wpm.words.size, 8)
         for (var word of wordCheck) {
             assert(wpm.words.has(word))
         }
         assert(!wpm.words.has('LOL'))
     })
     it('generates combs properly', () => {
-        assert.equal(wpm.combs.length, 7)
+        assert.equal(wpm.combs.length, 8)
+        assert.equal(wpm.combs[wpm.words.get('OO')].length, 3)
         assert.equal(wpm.combs[wpm.words.get('LO')].length, 3)
         assert.equal(wpm.combs[wpm.words.get('LOO')].length, 3)
         assert.equal(wpm.combs[wpm.words.get('LOCO')].length, 6)
@@ -30,8 +31,8 @@ describe('WordPlayMap', () => {
         assert(wpm.combs[wpm.words.get('LOL')] === undefined)
     })
     it('generates plays properly', () => {
-        assert.equal(wpm.plays.length, 33)
-        assert.equal(wpm.allPlays().length, 33)
+        assert.equal(wpm.plays.length, 36)
+        assert.equal(wpm.allPlays().length, 36)
 
         assert.equal(wpm.plays[wpm.combs[wpm.words.get('LO')][0]].word, 'LO')
         assert.equal(wpm.plays[wpm.combs[wpm.words.get('LO')][1]].word, 'LO')
