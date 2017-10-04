@@ -3,7 +3,7 @@
 const Play = require('./play.js')
 const Dictionary = require('dictionatrie')
 const fs = require('fs')
-const words = fs.readFileSync('./enable1.txt', 'utf8').split('\n')
+const words = fs.readFileSync('./word-lists/letterpress.txt', 'utf8').split('\n')
 const dictionary = Dictionary(words)
 
 class WordPlayMap {
@@ -15,8 +15,10 @@ class WordPlayMap {
         console.log('generating plays...')
         var start = Date.now()
         var gen = WordPlayMap.genPlays(letters)
-        var duration = Math.floor((Date.now() - start) / 1000)
-        console.log('generated ' + gen.plays.length + ' plays in ' + duration + ' seconds')
+        var duration = ((Date.now() - start) / 1000).toFixed(1)
+        console.log('generated ' + gen.plays.length + ' plays using ' + 
+                                   gen.combs.length + ' words in ' + 
+                                   duration + ' seconds')
 
         this.words = gen.words // Map: word => wordI // Optimization: Maybe use plain array?
         this.combs = gen.combs // [[playI, playI, ...], [playI, playI, ...], ...]
