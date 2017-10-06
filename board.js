@@ -2,9 +2,22 @@
 
 const State = require('./state.js')
 const WordPlayMap = require('./word-play-map.js')
-const LegalCache = require('./legal-cache.js')
 
+/**
+ * Class representing the Letterpress game board.
+ * Encapsulates the rules of Letterpress.
+ * Takes care of generating, storing, and returning legal moves for each given game state.
+ * Takes care of advancing a state given a legal move from that game state.
+ */
 class Board {
+    /**
+     * Create a new Letterpress board.
+     * Create a WordPlayMap, which generates all playable moves and stores them.
+     * @param {string[]} letters - The single-dimensional array of letters representing the letters on the Letterpress board.
+     * @param {number} numRows - The number of rows of the board.
+     * @param {number} numCols - The number of columns of the board.
+     * @param {number} startingPlayer - The starting player of the game. Can be either 1 or -1.
+     */
     constructor(letters, numRows, numCols, startingPlayer) {
         this.letters = letters || [ ]
         this.numRows = numRows || 0
@@ -14,35 +27,39 @@ class Board {
         this.wpm = new WordPlayMap(letters)
     }
 
+    /**
+     * Generate and return the initial game state based on the initial properties of the board.
+     * @return {State} The initial game state.
+     */
     start() {
-        /* Returns the starting state.
-        */
 
         // Generate starting ownership (all 0s)
         var ownership = new Array(this.letters.length)
         ownership.fill(0)
 
-        // Generate initial cache of legal plays
-        var legalCache = new LegalCache(this.wpm.allPlays())
-        // console.log(this.wpm.allPlays())
-
         // Generate initial state
-        var state = new State(ownership, [ ], this.startingPlayer, legalCache)
+        var state = new State(ownership, [ ], this.startingPlayer, this.wpm.allPlays())
 
         return state
     }
 
-    legal_plays(state) {
-        /* Return the current player's legal moves from the given state.
-        */
-
-        return state.legalCache.plays
+    /**
+     * Return the current player's legal moves from the given game state.
+     * @param {State} state - The state to find the legal moves of.
+     * @return {number[]} - The array of move indexes corresponding to the legal moves playable from this game state.
+     */
+    legalPlays(state) {
+        return state.legalPlays
     }
 
-    next_state(state, play) {
-        /* Take the game state, and the move to be applied.
-        ** Return the new game state.
-        */
+    /**
+     * Apply the given move to the given game state.
+     * Return the new game state.
+     * @param {State} state - The old game state.
+     * @param {number} play - The move index to be applied.
+     * @return {State} The new game state.
+     */
+    nextState(state, play) {
 
         var play = this.wpm.actualize(play) // Actualize play from index
 
@@ -98,19 +115,27 @@ class Board {
         // Update current player
         var currentPlayer = -state.currentPlayer
 
-        // Update legal plays
-        var legalCache = state.legalCache.copy()
-        var playsToRemove = this.wpm.getPlays(play.word)
-        legalCache.remove(playsToRemove)
+        // Copy legal plays
+        var legalPlays = state.legalPlays.slice()
 
-        var newState = new State(ownership, playedWords, currentPlayer, legalCache)
+        // Create new state
+        var newState = new State(ownership, playedWords, currentPlayer, legalPlays)
+
+        // Update legal plays
+        var playsToRemove = this.wpm.getPlays(play.word)
+        newState.removePlays(playsToRemove)
+
         return newState
     }
 
+    /**
+     * Get the winner of the game.
+     * If the game is over, return the winner (1 or -1).
+     * If the game is not over, return 0.
+     * @param {State} state - The game state to find the winner of.
+     * @return {number} The winner: either 1, -1, or 0.
+     */
     winner(state) {
-        /* If the game is over, return the winner.
-        ** If the game is not over, return 0.
-        */
 
         var score = 0
         for (var owner of state.ownership) {

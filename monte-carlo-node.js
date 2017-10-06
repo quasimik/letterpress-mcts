@@ -1,11 +1,15 @@
 'use strict'
 
+/**
+ * Class representing a node in the search tree.
+ * Stores UCB1 wins/simulations stats.
+ */
 class MonteCarloNode {
-    /* This stores stats
-    ** This also memoizes next_state
-    */
-
-    constructor() {
+    /**
+     * Create a new MonteCarloNode in the search tree.
+     * @param {MonteCarloNode} parent - The parent node.
+     */
+    constructor(parent) {
 
         // Monte Carlo stuff
         this.plays = 0
@@ -13,11 +17,16 @@ class MonteCarloNode {
         this.unexpandedPlays = null // Plays without Monte Carlo stats
 
         // Tree stuff
-        this.parent = null // MonteCarloNode object
+        this.parent = parent // MonteCarloNode object
         this.children = [ ] // Play => MonteCarloNode
     }
 
-    next_node(play) { // Memoized next_state
+    /**
+     * Get the MonteCarloNode corresponding to the given move.
+     * @param {number} play - The move index to find the child node of.
+     * @return {MonteCarloNode} The child node corresponding to the move index given.
+     */
+    nextNode(play) {
         var node = this.children[play]
         if (node !== undefined) {
             return node
@@ -28,13 +37,21 @@ class MonteCarloNode {
         }
     }
 
+    /**
+     * @return {boolean} Whether all the children moves have expanded nodes
+     */
     fullyExpanded() {
         if (this.unexpandedPlays !== null && this.unexpandedPlays.length === 0)
             return true
         else
             return false
     }
-
+    
+    /**
+     * Get the UCB1 value for this node.
+     * @param {number} biasParam - The square of the bias parameter in the UCB1 algorithm, defaults to 2.
+     * @return {number} The UCB1 value of this node.
+     */
     getUCB1(biasParam) {
         var bias = biasParam || 2;
         // process.stdout.write(wins + " " + plays + " " + bias + " " + this.parent.visits + " " + plays + "\n");

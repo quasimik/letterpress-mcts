@@ -2,8 +2,18 @@
 
 const MonteCarloNode = require('./monte-carlo-node.js')
 
+/**
+ * Class representing the Monte Carlo search tree.
+ * Takes care of generating and storing the search tree.
+ * Takes care of running simulations and calculating the best move.
+ */
 class MonteCarlo {
-
+    /**
+     * Create a Monte Carlo search tree.
+     * @param {Board} board - The game board to query regarding legal moves and state advancement.
+     * @param {number} maxDepth - The maximum search depth of all simulations run.
+     * @param {number} UCB1ExploreParam - The square of the bias parameter in the UCB1 algorithm, defaults to 2.
+     */
     constructor(board, maxDepth, UCB1ExploreParam) {
         this.board = board
         this.maxDepth = maxDepth || Infinity
@@ -12,42 +22,47 @@ class MonteCarlo {
         this.state = null // Current state node
 
         this.nodes = new Map() // Map: State.hash => MonteCarloNode
-        // Add: Map state + play hashes to states? i.e. next_state cache?
+        // Add: Map state + play hashes to states? i.e. nextState cache?
 
         // Informative/debug
         this.deeps = 0
     }
 
+    /**
+     * Update the state to find the best move for.
+     * @param {State} state - The state to find the best move for; its parent is set to null.
+     */
     update(state) {
-        /* Update the state to find the best move for.
-        */
 
         this.state = state
         if (!this.nodes.has(state)) {
-            var node = new MonteCarloNode()
-            node.unexpandedPlays = state.legal.slice()
+            var node = new MonteCarloNode(null)
+            node.unexpandedPlays = state.legalPlays.slice()
             // console.log(node.unexpandedPlays)
             this.nodes.set(state.hash, node)
         }
     }
 
-    get_play(timeLimit) {
-        /* Run as many simulations as possible until the time limit.
-        ** From the available statistics, calculate the best move and return it.
-        */
+    /**
+     * Run as many simulations as possible until the time limit.
+     * From the available statistics, calculate the best move from the current state.
+     * @param {number} timeout - The time to run the simulations for, in seconds.
+     * @return {Play} The best play from the current state.
+     */
+    getPlay(timeout) {
 
         var sims = 0
         var totalSims = 0
         var earlyTerminations = 0
         var totalDeeps = 0
         var start = Date.now()
-        var end = start + timeLimit * 1000
+        var end = start + timeout * 1000
         var notify = 3
 
         // Run simulations
         while (Date.now() < end) {
             if (Date.now() > start + notify * 1000) { // Notify every 3 seconds
-                console.log('time(s) ' + notify + '/' + timeLimit + 
+                console.log('time(s) ' + notify + '/' + timeout + 
                             ' | sims ' + sims + 
                             ' | rate(sims/s) ' + (sims/3).toFixed(1) + 
                             ' | depth ' + (this.deeps/sims).toFixed(1))
@@ -61,7 +76,7 @@ class MonteCarlo {
                 notify += 3
             }
 
-            var winner = this.run_simulation()
+            var winner = this.runSimulation()
 
             // if (sims === 33)
             //     throw new Error('debug')
@@ -71,9 +86,9 @@ class MonteCarlo {
             sims++
         }
 
-        console.log('time(s) ' + timeLimit + '/' + timeLimit + ' (FINISHED)')
+        console.log('time(s) ' + timeout + '/' + timeout + ' (FINISHED)')
         console.log('total sims : ' + totalSims)
-        console.log('total rate(sims/s) : ' + (totalSims/timeLimit).toFixed(1))
+        console.log('total rate(sims/s) : ' + (totalSims/timeout).toFixed(1))
         console.log('total avg. depth : ' + (totalDeeps/totalSims).toFixed(1))
         console.log('early terminations : ' + earlyTerminations) // Max depth reached OR no legal moves
 
@@ -81,7 +96,7 @@ class MonteCarlo {
         // console.log('-----')
         // var depth1Nodes = this.nodes.get(this.state.hash).children
         // for (var [play, node] of depth1Nodes) {
-        //     console.log(this.board.next_state(this.state, play).hash, ' : (', node.wins, '/', node.plays, ')')
+        //     console.log(this.board.nextState(this.state, play).hash, ' : (', node.wins, '/', node.plays, ')')
         // }
         // console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
 
@@ -90,12 +105,12 @@ class MonteCarlo {
             return null
         
         // Get best play (most plays)
-        var legal = this.state.legal
+        var legal = this.state.legalPlays
         var maxPlays = 0
         var bestPlay
         var node = this.nodes.get(this.state.hash)
         for (var i = 0; i < legal.length; i++) {
-            var childNode = node.next_node(legal[i])
+            var childNode = node.nextNode(legal[i])
             if (childNode.plays > maxPlays) {
                 bestPlay = legal[i]
                 maxPlays = childNode.plays
@@ -104,10 +119,12 @@ class MonteCarlo {
         return this.board.wpm.actualize(bestPlay)
     }
 
-    run_simulation() {
-        /* Play one game to completion from the current state.
-        ** Update the search tree with new information from the game result.
-        */
+    /**
+     * Simulate one game to completion from the current state.
+     * Create one node in the search tree.
+     * Update the visited nodes with new information from the simulation.
+     */
+    runSimulation() {
 
         // Initial values
         var state = this.state // No need to copy because we do not modify it
@@ -135,7 +152,7 @@ class MonteCarlo {
             }
             else {
                 // console.log('pick from full list')
-                legal = this.board.legal_plays(state)
+                legal = state.legalPlays
             }
             // console.log('state : ' + state.hash)
             // console.log('legal : ' + legal) // Warning: very verbose
@@ -151,7 +168,7 @@ class MonteCarlo {
                 // console.log(node.unexpandedPlays)
                 var maxUCB1 = 0
                 for (var i = 0; i < legal.length; i++) {
-                    var childUCB1 = node.next_node(legal[i]).getUCB1(this.UCB1ExploreParam)
+                    var childUCB1 = node.nextNode(legal[i]).getUCB1(this.UCB1ExploreParam)
                     if (childUCB1 > maxUCB1) {
                         play = legal[i]
                         maxUCB1 = childUCB1
@@ -168,7 +185,7 @@ class MonteCarlo {
             // console.log('chosen play : ' + play)
 
             // Advance the state and node
-            var newState = this.board.next_state(state, play)
+            var newState = this.board.nextState(state, play)
             var newNode = this.nodes.get(newState.hash)
 
             // console.log('at : ' + newState.hash)
@@ -180,9 +197,8 @@ class MonteCarlo {
                 // console.log('expanding : ' + newState.hash)
 
                 // Make new Node
-                newNode = new MonteCarloNode()
-                newNode.unexpandedPlays = newState.legal.slice()
-                newNode.parent = node
+                newNode = new MonteCarloNode(node)
+                newNode.unexpandedPlays = newState.legalPlays.slice()
 
                 // Update parent Node
                 // node.children.add(newNode)
