@@ -108,8 +108,6 @@ class Board {
 
         // Update played words
         var playedWords = state.playedWords.slice()
-        // console.log('play : ' + play)
-        // console.log('word : ' + this.get_word(play))
         playedWords.push(play.word)
 
         // Update current player

@@ -36,8 +36,8 @@ class MonteCarlo {
 
         this.state = state
         if (!this.nodes.has(state)) {
-            var node = new MonteCarloNode(null)
-            node.unexpandedPlays = state.legalPlays.slice()
+            var unexpandedPlays = state.legalPlays.slice()
+            var node = new MonteCarloNode(null, unexpandedPlays)
             // console.log(node.unexpandedPlays)
             this.nodes.set(state.hash, node)
         }
@@ -62,10 +62,11 @@ class MonteCarlo {
         // Run simulations
         while (Date.now() < end) {
             if (Date.now() > start + notify * 1000) { // Notify every 3 seconds
-                console.log('time(s) ' + notify + '/' + timeout + 
-                            ' | sims ' + sims + 
-                            ' | rate(sims/s) ' + (sims/3).toFixed(1) + 
-                            ' | depth ' + (this.deeps/sims).toFixed(1))
+                console.log(   'secs ' +      notify + '/' + timeout + 
+                            ' | sims '  +     sims + 
+                            ' | sims/s ' +    (sims/3).toFixed(0) + 
+                            ' | deeps/s ' +   (this.deeps/3).toFixed(0) +
+                            ' | avg.depth ' + (this.deeps/sims).toFixed(1))
 
                 totalSims += sims
                 sims = 0
@@ -143,17 +144,14 @@ class MonteCarlo {
             // Get legal plays
             var legal
             if (node !== undefined && !node.fullyExpanded()) {
-                /* Node exists and not all stats are available.
-                ** Pick from list of unexpanded plays.
-                */
-
-                // console.log('pick from unexpanded')
+                // console.log('get legal plays from unexpanded')
                 legal = node.unexpandedPlays
             }
             else {
-                // console.log('pick from full list')
+                // console.log('get legal plays from full list')
                 legal = state.legalPlays
             }
+
             // console.log('state : ' + state.hash)
             // console.log('legal : ' + legal) // Warning: very verbose
             
@@ -190,21 +188,18 @@ class MonteCarlo {
 
             // console.log('at : ' + newState.hash)
 
-            // Expand the first unexpanded state this simulation run
+            // Expand once this simulation run
             if (expand && newNode === undefined) {
                 expand = false
 
                 // console.log('expanding : ' + newState.hash)
 
                 // Make new Node
-                newNode = new MonteCarloNode(node)
-                newNode.unexpandedPlays = newState.legalPlays.slice()
+                var unexpandedPlays = newState.legalPlays.slice()
+                newNode = new MonteCarloNode(node, unexpandedPlays)
 
                 // Update parent Node
-                // node.children.add(newNode)
-                node.children[play] = newNode
-                var index = node.unexpandedPlays.indexOf(play)
-                node.unexpandedPlays.splice(index, 1)
+                node.expand(play, newNode)
 
                 // Update Node map
                 this.nodes.set(newState.hash, newNode)

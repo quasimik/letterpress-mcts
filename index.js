@@ -35,7 +35,7 @@ var letterBoard3 = [
 
 var letterBoard2 = [
     'P', 'I',
-    'E', 'T']
+    'E', 'T' ]
 
 var letterBoard0 = [
     'C', 'O', 'O',
@@ -50,7 +50,7 @@ var board = new Board(letterBoard4, 4, 4, 1)
 var state = board.start()
 console.log('legal plays : ' + board.legalPlays(state).length)
 
-var mc = new MonteCarlo(board, 100, 10)
+var mc = new MonteCarlo(board, 100)
 mc.update(state)
 var play = mc.getPlay(90)
 if (play)

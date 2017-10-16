@@ -8,23 +8,24 @@ class MonteCarloNode {
     /**
      * Create a new MonteCarloNode in the search tree.
      * @param {MonteCarloNode} parent - The parent node.
+     * @param {number[]} unexpandedPlays - An array of unexpanded play indexes.
      */
-    constructor(parent) {
+    constructor(parent, unexpandedPlays) {
 
         // Monte Carlo stuff
         this.plays = 0
         this.wins = 0
-        this.unexpandedPlays = null // Plays without Monte Carlo stats
 
         // Tree stuff
-        this.parent = parent // MonteCarloNode object
-        this.children = [ ] // Play => MonteCarloNode
+        this.parent = parent // Parent MonteCarloNode
+        this.unexpandedPlays = unexpandedPlays // Plays without nodes
+        this.children = [ ] // Play index => Child MonteCarloNode
     }
 
     /**
-     * Get the MonteCarloNode corresponding to the given move.
-     * @param {number} play - The move index to find the child node of.
-     * @return {MonteCarloNode} The child node corresponding to the move index given.
+     * Get the MonteCarloNode corresponding to the given play.
+     * @param {number} play - The play index to find the child node of.
+     * @return {MonteCarloNode} The child node corresponding to the play index given.
      */
     nextNode(play) {
         var node = this.children[play]
@@ -38,7 +39,20 @@ class MonteCarloNode {
     }
 
     /**
-     * @return {boolean} Whether all the children moves have expanded nodes
+     * Expand a child play.
+     * Add the node to the array of children nodes.
+     * Remove the play from the array of unexpanded plays.
+     * @param {number} playIndex - The play index of the play to expand.
+     * @param {MonteCarloNode} childNode - The child node.
+     */
+    expand(playIndex, childNode) {
+        this.children[playIndex] = childNode
+        var index = this.unexpandedPlays.indexOf(playIndex)
+        this.unexpandedPlays.splice(index, 1)
+    }
+
+    /**
+     * @return {boolean} Whether all the children plays have expanded nodes
      */
     fullyExpanded() {
         if (this.unexpandedPlays !== null && this.unexpandedPlays.length === 0)
@@ -53,9 +67,7 @@ class MonteCarloNode {
      * @return {number} The UCB1 value of this node.
      */
     getUCB1(biasParam) {
-        var bias = biasParam || 2;
-        // process.stdout.write(wins + " " + plays + " " + bias + " " + this.parent.visits + " " + plays + "\n");
-        return (this.wins / this.plays) + Math.sqrt(bias * Math.log(this.parent.plays) / this.plays);
+        return (this.wins / this.plays) + Math.sqrt(biasParam * Math.log(this.parent.plays) / this.plays);
     }
 }
 
