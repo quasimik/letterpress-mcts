@@ -4,7 +4,7 @@ const Play = require('./play.js')
 const Dictionary = require('dictionatrie')
 const fs = require('fs')
 const words = fs.readFileSync('./word-lists/letterpress.txt', 'utf8').split('\n')
-const dictionary = Dictionary(words)
+const dictionary = new Dictionary(words)
 
 /**
  * Class responsible for generating, storing, indexing, and restoring all legal moves in the given array of letters.
@@ -59,7 +59,7 @@ class WordPlayMap {
                 
                 var newLetter = letters[availableTiles[i]]
 
-                // Check if this new word fragement is a prefix of any real word
+                // Check if this new word fragment is a prefix of any real word
                 var newWordFragment = wordFragment + newLetter
                 // console.log('at : ' + newWordFragment + ' (' + availableTiles[i] + ')')
                 if (!dictionary.has(newWordFragment.toLowerCase(), true)) // partial (prefix) match
