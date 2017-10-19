@@ -14,7 +14,7 @@ class Play {
         this.cells = cells
     }
 
-    /** Get the hash pf the play. */
+    /** Get the hash of the play. */
     get hash() {
         return this.word + this.cells.toString()
     }
