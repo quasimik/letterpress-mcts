@@ -25,7 +25,7 @@ class MonteCarlo {
         // Add: Map state + play hashes to states? i.e. nextState cache?
 
         // Informative/debug
-        this.deeps = 0
+        // this.deeps = 0
     }
 
     /**
@@ -51,40 +51,39 @@ class MonteCarlo {
      */
     getPlay(timeout) {
 
-        var sims = 0
         var totalSims = 0
-        var earlyTerminations = 0
         var totalDeeps = 0
+        var earlyTerminations = 0
+        
         var start = Date.now()
         var end = start + timeout * 1000
+
         var notify = 3
+        var statSims = 0
+        var statDeeps = 0
 
         // Run simulations
         while (Date.now() < end) {
             if (Date.now() > start + notify * 1000) { // Notify every 3 seconds
                 console.log(   'secs ' +      notify + '/' + timeout + 
-                            ' | sims '  +     sims + 
-                            ' | sims/s ' +    (sims/3).toFixed(0) + 
-                            ' | deeps/s ' +   (this.deeps/3).toFixed(0) +
-                            ' | avg.depth ' + (this.deeps/sims).toFixed(1))
+                            ' | sims '  +     (totalSims - statSims) + 
+                            ' | sims/s ' +    ((totalSims - statSims)/3).toFixed(0) + 
+                            ' | deeps/s ' +   ((totalDeeps - statDeeps)/3).toFixed(0) +
+                            ' | avg.depth ' + ((totalDeeps - statDeeps)/(totalSims - statSims)).toFixed(1))
 
-                totalSims += sims
-                sims = 0
-
-                totalDeeps += this.deeps
-                this.deeps = 0
-
+                statSims = totalSims
+                statDeeps = totalDeeps
                 notify += 3
             }
 
-            var winner = this.runSimulation()
+            var data = this.runSimulation()
+            var winner = data['winner']
+            var deeps = data['deeps']
 
-            // if (sims === 33)
-            //     throw new Error('debug')
-            
             if (winner === 0)
                 earlyTerminations++
-            sims++
+            totalSims++
+            totalDeeps += deeps
         }
 
         console.log('time(s) ' + timeout + '/' + timeout + ' (FINISHED)')
@@ -94,18 +93,30 @@ class MonteCarlo {
         console.log('early terminations : ' + earlyTerminations) // Max depth reached OR no legal moves
 
         // Output statistics for depth=1 nodes
-        // console.log('-----')
-        // var depth1Nodes = this.nodes.get(this.state.hash).children
-        // for (var [play, node] of depth1Nodes) {
-        //     console.log(this.board.nextState(this.state, play).hash, ' : (', node.wins, '/', node.plays, ')')
-        // }
-        // console.log(this.state.hash, ' : (', this.nodes.get(this.state.hash).wins, '/', this.nodes.get(this.state.hash).plays, ')')
+        console.log('-----')
+        var arr = [ ]
+        var childrenPlays = this.nodes.get(this.state.hash).children
+        for (var i = 0; i < childrenPlays.length; i++) {
+            arr.push([ 
+                childrenPlays[i].plays, 
+                this.board.nextState(this.state, i).hash + ' : (' + 
+                childrenPlays[i].wins + '/' + 
+                childrenPlays[i].plays + ')' ])
+        }
+        arr.push([ this.nodes.get(this.state.hash).plays,
+            this.state.hash + ' : (' + 
+            this.nodes.get(this.state.hash).wins + '/' + 
+            this.nodes.get(this.state.hash).plays + ')' ])
+        arr.sort(function(a,b) { return b[0] - a[0] })
+        for (var i = 0; i < 6; i++) {
+            console.log(arr[i][1])
+        }
 
         // If not all children are expanded, no best play
         if (!this.nodes.get(this.state.hash).fullyExpanded())
             return null
         
-        // Get best play (most plays)
+        // Get play with most visits (Chaslot's robust child)
         var legal = this.state.legalPlays
         var maxPlays = 0
         var bestPlay
@@ -131,6 +142,7 @@ class MonteCarlo {
         var state = this.state // No need to copy because we do not modify it
         var node = this.nodes.get(state.hash)
         var winner = null
+        var deeps = 0
 
         var visitedStates = new Set()
         visitedStates.add(state)
@@ -139,7 +151,7 @@ class MonteCarlo {
         var expand = true // Expand once per simulation
         for (var depth = 0; depth < this.maxDepth; depth++) {
 
-            this.deeps++
+            deeps++
 
             // Get legal plays
             var legal
@@ -234,7 +246,7 @@ class MonteCarlo {
         if (winner === 0) {
             // console.log('max depth reached OR no legal moves')
         }
-        return winner
+        return {'winner': winner, 'deeps': deeps}
     }
 }
 
