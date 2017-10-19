@@ -120,7 +120,7 @@ class Board {
         var newState = new State(ownership, playedWords, currentPlayer, legalPlays)
 
         // Update legal plays
-        var playsToRemove = this.wpm.getPlays(play.word)
+        var playsToRemove = this.wpm.getPrefixes(play.word)
         newState.removePlays(playsToRemove)
 
         return newState

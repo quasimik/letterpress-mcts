@@ -141,7 +141,26 @@ class WordPlayMap {
      */
     getPlays(word) {
         var wordI = this.words.get(word)
+        if (wordI === undefined)
+            return [ ]
         return this.combs[wordI]
+    }
+
+    /**
+     * Same as getPlays, but also returns all plays that are prefixes.
+     * @param {string} word - The word.
+     * @return {number[]} The array of move indexes that correspond to the word and its prefixes.
+     */
+    getPrefixes(word) {
+        var plays = [ ]
+        while (word.length > 1) {
+            var combs = this.getPlays(word)
+            for (var i = 0; i < combs.length; i++) {
+                plays.push(combs[i])
+            }
+            word = word.slice(0, -1)
+        }
+        return plays
     }
 }
 
