@@ -1,9 +1,10 @@
 'use strict'
 
+const os = require('os')
 const Play = require('./play.js')
 const Dictionary = require('dictionatrie')
 const fs = require('fs')
-const words = fs.readFileSync('./word-lists/letterpress.txt', 'utf8').split('\n')
+const words = fs.readFileSync('./word-lists/letterpress.txt', 'utf8').split(os.EOL)
 const dictionary = new Dictionary(words)
 
 /**
