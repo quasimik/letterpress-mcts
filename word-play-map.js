@@ -1,20 +1,16 @@
 'use strict'
 
+const os = require('os')
 const Play = require('./play.js')
 const Dictionary = require('dictionatrie')
 const fs = require('fs')
-const words = fs.readFileSync('./word-lists/letterpress.txt', 'utf8').split('\n')
+const words = fs.readFileSync('./word-lists/letterpress.txt', 'utf8').split(os.EOL)
 const dictionary = new Dictionary(words)
 
-/**
- * Class responsible for generating, storing, indexing, and restoring all legal moves in the given array of letters.
- * This class is dimension-agnostic, so it does not accept any board dimension parameters.
- */
 class WordPlayMap {
-    /**
-     * Create a new WordPlayMap.
-     * @param {string[]} letters - The single-dimensional array of letters to find all the moves for.
-     */
+    /* Backing store of all plays
+    */
+
     constructor(letters) {
 
         console.log('generating plays...')
@@ -30,13 +26,9 @@ class WordPlayMap {
         this.plays = gen.plays // [Play, Play, ...]
     }
 
-    /**
-     * Generate all the moves possible in the given array of letters.
-     * Map all playable words to their combinations of moves.
-     * @param {string[]} letters - The single-dimensional array of letters to find all the moves for.
-     * @return {Object} The object containing a mapping of playable words to their combinations of moves.
-     */
     static genPlays(letters) {
+        /* Generate everything
+        */
 
         var words = new Map()
         var combs = [ ]
@@ -59,7 +51,7 @@ class WordPlayMap {
                 
                 var newLetter = letters[availableTiles[i]]
 
-                // Check if this new word fragment is a prefix of any real word
+                // Check if this new word fragement is a prefix of any real word
                 var newWordFragment = wordFragment + newLetter
                 // console.log('at : ' + newWordFragment + ' (' + availableTiles[i] + ')')
                 if (!dictionary.has(newWordFragment.toLowerCase(), true)) // partial (prefix) match
@@ -113,11 +105,10 @@ class WordPlayMap {
         return { 'words' : words, 'combs' : combs, 'plays' : plays }
     }
 
-    /**
-     * Get all moves possible on the board as move indexes.
-     * @return {number[]} The array of all move indexes.
-     */
     allPlays() {
+        /* Get all plays possible on the board
+        */
+
         var plays = [ ]
         for (var i = 0; i < this.plays.length; i++) {
             plays.push(i)
@@ -125,42 +116,16 @@ class WordPlayMap {
         return plays
     }
 
-    /**
-     * Restore a Play object from its move index.
-     * @param {number} index - The move index.
-     * @return {Play} The Play object.
-     */
-    actualize(index) {
-        return this.plays[index]
+    actualize(playI) {
+        return this.plays[playI]
     }
 
-    /**
-     * Get all move combinations of a word as an array of move indexes.
-     * @param {string} word - The word.
-     * @return {number[]} The array of move indexes that correspond to the word.
-     */
     getPlays(word) {
-        var wordI = this.words.get(word)
-        if (wordI === undefined)
-            return [ ]
-        return this.combs[wordI]
-    }
+        /* Get all plays using given word as an array of play indexes
+        */
 
-    /**
-     * Same as getPlays, but also returns all plays that are prefixes.
-     * @param {string} word - The word.
-     * @return {number[]} The array of move indexes that correspond to the word and its prefixes.
-     */
-    getPrefixes(word) {
-        var plays = [ ]
-        while (word.length > 1) {
-            var combs = this.getPlays(word)
-            for (var i = 0; i < combs.length; i++) {
-                plays.push(combs[i])
-            }
-            word = word.slice(0, -1)
-        }
-        return plays
+        var wordI = this.words.get(word)
+        return this.combs[wordI]
     }
 }
 
