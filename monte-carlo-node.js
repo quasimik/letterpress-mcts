@@ -19,7 +19,7 @@ class MonteCarloNode {
         // Tree stuff
         this.parent = parent // Parent MonteCarloNode
         this.unexpandedPlays = unexpandedPlays // Plays without nodes
-        this.children = [ ] // Play index => Child MonteCarloNode
+        this.children = [ ] // Play index => Child MonteCarloNode ; discontinuous array
     }
 
     /**

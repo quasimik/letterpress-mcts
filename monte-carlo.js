@@ -92,6 +92,10 @@ class MonteCarlo {
         console.log('total avg. depth : ' + (totalDeeps/totalSims).toFixed(1))
         console.log('early terminations : ' + earlyTerminations) // Max depth reached OR no legal moves
 
+        // If not all children are expanded, no best play
+        if (!this.nodes.get(this.state.hash).fullyExpanded())
+            return null
+        
         // Output statistics for depth=1 nodes
         console.log('-----')
         var arr = [ ]
@@ -112,10 +116,6 @@ class MonteCarlo {
             console.log(arr[i][1])
         }
 
-        // If not all children are expanded, no best play
-        if (!this.nodes.get(this.state.hash).fullyExpanded())
-            return null
-        
         // Get play with most visits (Chaslot's robust child)
         var legal = this.state.legalPlays
         var maxPlays = 0
