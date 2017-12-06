@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --harmony --max_old_space_size=4096 index.js",
+    "start": "node --harmony --max_old_space_size=8192 index.js",
     "test": "mocha test/tests.js",
-    "profile": "rm isolate* ; NODE_ENV=production node --harmony --max_old_space_size=4096 --prof index.js ; node --prof-process isolate* > prof.out",
+    "profile": "rm isolate* ; NODE_ENV=production node --harmony --max_old_space_size=8192 --prof index.js ; node --prof-process isolate* > prof.out",
     "jsdoc": "./node_modules/.bin/jsdoc --readme ./README.md --destination ./docs/ *.js"
   },
   "repository": {

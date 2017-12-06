@@ -3,8 +3,34 @@ Notes:
 The agent seems to be approaching the limits of vanilla MCTS.
 Implementing a custom first-play policy seems like a good way to delay exploration of all child nodes.
 Move groups might be an interesting avenue to reduce the effective branching factor.
-Perhaps also consider 
-Played word prefix removal is not implemented.
+
+
+
+Improvements considered:
+
+Bandit enhancements: We'll stick to UCB1 for now.
+
+Selection enhancements: Considering implementing FPU + D/ADM + PB:
+    Have a heuristic H based on:
+        (1)(?) Decisive/Anti-decisive moves (Infinite/-Infinite)
+        (2) Majority tile lockdown (some large number)
+        (3) +/- protected tile value (biased to more)
+        (4) +/- unprotected tile value (biased to less)
+    Then use H to calculate progressive bias term B = H / (n + 1), n is number of sims.
+    Then use B as additive first-play urgency term during selection.
+
+Exploration parameter C tuning: Dynamic exploration (Bourki) looks interesting.
+
+History heuristic: progressive history (Nijssen & Winands) might have some merit? (Dubious)
+
+AMAF: RAVE and variants looks promising (actually dubious).
+Take a look at Helmbold & Parker-Wood's comparison of AMAF variants.
+Actually, it might be bad because of how tight Letterpress games tend to be.
+
+Game-theoretic enhancements: proof-number search / MC-PNS (Saito) looks promising.
+
+
+
 
 Links & Papers:
 
