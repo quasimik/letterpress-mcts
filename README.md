@@ -5,7 +5,7 @@ An application of Monte-Carlo Tree Search in the game of Letterpress.
 ## Instructions
 1. Clone
 2. Run `npm install` to ensure Node.js module dependencies are installed
-3. Run `npm start` to run the MCTS algorithm on a 3\*3 letterpress board for 5 seconds.
+3. Run `npm start` to run the MCTS algorithm on a 3\*3 letterpress board for 5 seconds
 
 ## Structure
 ```
@@ -67,3 +67,9 @@ An application of Monte-Carlo Tree Search in the game of Letterpress.
 * Return whether all children plays have been expanded
 * Given a bias, return the UCB1 value of this node
 
+## Documentation
+
+This project uses [JSDoc 3](http://usejsdoc.org/index.html) to automatically generate .html docs from in-code documentation.
+
+1. Run `npm run jsdoc` (make sure you've done `npm install`)
+2. Open `./docs/index.html` in a browser
