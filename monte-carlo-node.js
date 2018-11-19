@@ -15,6 +15,7 @@ class MonteCarloNode {
         // Monte Carlo stuff
         this.plays = 0
         this.wins = 0
+        this.FPU = 0 // TODO: Heuristic
 
         // Tree stuff
         this.parent = parent // Parent MonteCarloNode
