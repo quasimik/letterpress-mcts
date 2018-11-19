@@ -5,7 +5,7 @@ An application of Monte-Carlo Tree Search in the game of Letterpress.
 ## Instructions
 1. Clone
 2. Run `npm install` to ensure Node.js module dependencies are installed
-3. Run `node index.js` to run the MCTS algorithm on a 3\*3 letterpress board for 5 seconds.
+3. Run `npm start` to run the MCTS algorithm on a 3\*3 letterpress board for 5 seconds.
 
 ## Structure
 ```
